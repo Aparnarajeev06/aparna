@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | Admin System Access{% endblock %}
+
+{% block content %}
+
+<div class="container my-5 py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-8">
+            <div class="glass-panel p-5 border-neon-purple live-glow">
+                
+                <div class="text-center mb-5">
+                    <i class="fa-solid fa-user-secret fa-4x text-warning mb-3 pulsate"></i>
+                    <h2 class="brand-font text-white text-uppercase">ADMIN NEXUS</h2>
+                    <p class="small text-muted">System Administrator Portal - Authorization Required</p>
+                </div>
+
+                {% if messages %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-left: 3px solid var(--neon-purple);">
+                        {% for message in messages %}
+                            <i class="fa-solid fa-shield me-2"></i>{{ message }}
+                        {% endfor %}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small" for="id_username"><i class="fa-solid fa-terminal me-2 text-warning"></i>Admin Username</label>
+                        <input type="text" name="username" id="id_username" class="form-control form-cyber text-white py-2" placeholder="Admin credentials..." required autocomplete="username">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small" for="id_password"><i class="fa-solid fa-key me-2 text-warning"></i>Admin Passcode</label>
+                        <input type="password" name="password" id="id_password" class="form-control form-cyber text-white py-2" placeholder="Admin password..." required autocomplete="current-password">
+                    </div>
+
+                    <button type="submit" class="btn btn-warning w-100 py-3 mt-3 text-dark fw-bold">
+                        <i class="fa-solid fa-lock-open me-2"></i>Access Admin System
+                    </button>
+                </form>
+
+                <hr class="my-4" style="background-color: var(--neon-purple); opacity: 0.25;">
+
+                <div class="text-center">
+                    <p class="small text-muted mb-2">Not an administrator?</p>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-cyber-outline w-100 py-2">User Login Portal</a>
+                </div>
+
+                <div class="mt-4 p-3" style="background-color: rgba(0, 255, 255, 0.05); border-left: 3px solid var(--neon-blue); border-radius: 4px;">
+                    <p class="text-center small text-info mb-0">
+                        <i class="fa-solid fa-shield me-1"></i>
+                        <strong>Authorized Personnel Only</strong>
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

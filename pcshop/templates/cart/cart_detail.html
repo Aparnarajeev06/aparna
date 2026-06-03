@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | Active Shopping Cart{% endblock %}
+
+{% block content %}
+
+<!-- Header Page Banner -->
+<section class="py-4 bg-dark border-bottom border-secondary mb-5" style="background: linear-gradient(180deg, #050508 0%, var(--bg-dark) 100%);">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-info text-decoration-none small">Home</a></li>
+                <li class="breadcrumb-item active text-white small" aria-current="page">Shopping Cart</li>
+            </ol>
+        </nav>
+        <h1 class="brand-font text-white mb-0 text-uppercase"><i class="fa-solid fa-cart-shopping me-2 text-info"></i>Active Cargo</h1>
+    </div>
+</section>
+
+<!-- Cart Details Container -->
+<div class="container my-5">
+    {% if cart.items.count > 0 %}
+        <div class="row g-5">
+            
+            <!-- Cargo List Table -->
+            <div class="col-lg-8">
+                <div class="glass-panel p-4 border-neon-purple">
+                    <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2">Inventory Registry</h3>
+                    <div class="table-responsive">
+                        <table class="table table-cyber text-white mb-0" style="font-size: 14px; vertical-align: middle;">
+                            <thead>
+                                <tr>
+                                    <th>Part Image</th>
+                                    <th>Hardware Description</th>
+                                    <th>Unit Price</th>
+                                    <th class="text-center">Quantity</th>
+                                    <th>Total Price</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart.items.all %}
+                                    <tr>
+                                        <td>
+                                            <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" class="rounded border border-secondary" style="width: 60px; height: 60px; object-fit: cover;">
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'products:detail' item.product.slug %}" class="text-white text-decoration-none fw-bold text-hover-info">{{ item.product.name }}</a>
+                                            <div class="small text-muted mt-1">{{ item.product.brand.name }} • Stock: {{ item.product.stock }}</div>
+                                        </td>
+                                        <td class="brand-font text-info">${{ item.product.price }}</td>
+                                        <td style="max-width: 130px;">
+                                            <form action="{% url 'cart:update' item.product.id %}" method="POST" class="d-flex align-items-center justify-content-center gap-1">
+                                                {% csrf_token %}
+                                                <input type="number" name="quantity" class="form-control form-cyber text-white text-center py-1 px-2" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" style="font-family: 'Orbitron', sans-serif; font-size: 13px;">
+                                                <button type="submit" class="btn btn-cyber-outline py-1 px-2 btn-sm" title="Update"><i class="fa-solid fa-rotate"></i></button>
+                                            </form>
+                                        </td>
+                                        <td class="brand-font text-info fw-bold">${{ item.total_price }}</td>
+                                        <td class="text-end">
+                                            <a href="{% url 'cart:remove' item.product.id %}" class="btn btn-cyber-danger btn-sm p-2 d-inline-flex align-items-center justify-content-center" style="width: 35px; height: 35px; border-radius: 50%;" title="Remove part"><i class="fa-solid fa-trash-can"></i></a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing Summary Card -->
+            <div class="col-lg-4">
+                <div class="glass-panel p-4 border-neon-blue h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-calculator me-2"></i>Pricing Telemetry</h3>
+                        <div class="p-3 bg-dark rounded border border-secondary mb-4" style="background: rgba(10,10,12,0.4);">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Cargo Items:</span>
+                                <span class="fw-bold">{{ cart.total_items }} units</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Hardware Subtotal:</span>
+                                <span class="fw-bold">${{ cart.total_price }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Express Logistics:</span>
+                                <span class="text-success fw-bold">FREE PROMO</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3 border-top border-secondary pt-3">
+                                <span class="brand-font text-white">Aggregated Total:</span>
+                                <span class="brand-font text-info fs-4 fw-bold" style="text-shadow: 0 0 10px rgba(0,229,255,0.3);">${{ cart.total_price }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Checkout triggers -->
+                    <div class="border-top border-secondary pt-4 d-flex flex-column gap-3">
+                        <a href="{% url 'orders:checkout' %}" class="btn btn-rgb py-3 w-100 fs-5 d-flex align-items-center justify-content-center gap-2">
+                            <i class="fa-solid fa-credit-card"></i>Initiate Checkout Protocol
+                        </a>
+                        <a href="{% url 'products:list' %}" class="btn btn-cyber-outline py-2 w-100 text-center"><i class="fa-solid fa-shop me-2"></i>Continue shopping</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    {% else %}
+        <!-- Empty Cart -->
+        <div class="row justify-content-center py-5">
+            <div class="col-lg-6 text-center glass-panel border-neon-blue p-5 live-glow">
+                <i class="fa-solid fa-box-open fa-6x text-muted mb-4 pulsate"></i>
+                <h2 class="brand-font text-white mb-3">Shopping Cargo Empty</h2>
+                <p class="text-muted fs-5 mb-4">No high-performance gaming hardware detected in active session cargo bays.</p>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a href="{% url 'products:list' %}" class="btn btn-rgb px-4 py-3"><i class="fa-solid fa-store me-2"></i>Browse Hardware Depot</a>
+                    <a href="{% url 'builder:configurator' %}" class="btn btn-cyber-outline px-4 py-3"><i class="fa-solid fa-screwdriver-wrench me-2"></i>Boot Custom Rig Configurator</a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

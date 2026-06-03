@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | Digital Hardware Nexus{% endblock %}
+
+{% block content %}
+
+<!-- Header Page Banner -->
+<section class="py-4 bg-dark border-bottom border-secondary mb-4" style="background: linear-gradient(180deg, #050508 0%, var(--bg-dark) 100%);">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-info text-decoration-none small">Home</a></li>
+                <li class="breadcrumb-item active text-white small" aria-current="page">Products Catalog</li>
+            </ol>
+        </nav>
+        <h1 class="brand-font text-white mb-0 text-uppercase"><i class="fa-solid fa-layer-group me-2 text-info"></i>Hardware Depot</h1>
+    </div>
+</section>
+
+<!-- Main Container -->
+<div class="container my-4">
+    <div class="row g-4">
+        
+        <!-- Sidebar Cyber Filters -->
+        <div class="col-lg-3">
+            <div class="glass-panel p-4 border-neon-purple">
+                <h4 class="brand-font text-info mb-4 border-bottom border-secondary pb-2">
+                    <i class="fa-solid fa-filter me-2"></i>Filters
+                </h4>
+                
+                <form action="{% url 'products:list' %}" method="GET">
+                    <!-- Preserve active keyword search -->
+                    {% if params.q %}
+                        <input type="hidden" name="q" value="{{ params.q }}">
+                    {% endif %}
+
+                    <!-- Category Filter -->
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small">Category</label>
+                        <select name="category" class="form-select form-cyber text-white">
+                            <option value="">-- All Categories --</option>
+                            {% for cat in categories %}
+                                <option value="{{ cat.slug }}" {% if params.category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Brand Filter -->
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small">Brand</label>
+                        <select name="brand" class="form-select form-cyber text-white">
+                            <option value="">-- All Brands --</option>
+                            {% for brand in brands %}
+                                <option value="{{ brand.slug }}" {% if params.brand == brand.slug %}selected{% endif %}>{{ brand.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Price range -->
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small">Price Limits ($)</label>
+                        <div class="d-flex gap-2">
+                            <input type="number" name="min_price" class="form-control form-cyber text-white py-2" placeholder="Min" value="{{ params.min_price }}" style="font-size: 13px;">
+                            <input type="number" name="max_price" class="form-control form-cyber text-white py-2" placeholder="Max" value="{{ params.max_price }}" style="font-size: 13px;">
+                        </div>
+                    </div>
+
+                    <!-- Socket Type -->
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small">Socket (CPU/Motherboard)</label>
+                        <select name="socket" class="form-select form-cyber text-white">
+                            <option value="">-- All Sockets --</option>
+                            {% for sock in socket_types %}
+                                <option value="{{ sock }}" {% if params.socket == sock %}selected{% endif %}>{{ sock }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- RAM Type -->
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small">RAM Generation</label>
+                        <select name="ram" class="form-select form-cyber text-white">
+                            <option value="">-- All RAM --</option>
+                            {% for rt in ram_types %}
+                                <option value="{{ rt }}" {% if params.ram == rt %}selected{% endif %}>{{ rt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Storage Format -->
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small">Storage Format</label>
+                        <select name="storage" class="form-select form-cyber text-white">
+                            <option value="">-- All Storage --</option>
+                            {% for st in storage_types %}
+                                <option value="{{ st }}" {% if params.storage == st %}selected{% endif %}>{{ st }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- RGB illumination -->
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small">RGB Illumination</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="rgb" id="rgbAll" value="" {% if not params.rgb %}checked{% endif %}>
+                            <label class="form-check-label small text-muted" for="rgbAll">All Parts</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="rgb" id="rgbYes" value="yes" {% if params.rgb == 'yes' %}checked{% endif %}>
+                            <label class="form-check-label small text-info" for="rgbYes">RGB Supported</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="rgb" id="rgbNo" value="no" {% if params.rgb == 'no' %}checked{% endif %}>
+                            <label class="form-check-label small text-muted" for="rgbNo">Non-RGB</label>
+                        </div>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="d-flex flex-column gap-2 mt-4">
+                        <button type="submit" class="btn btn-rgb w-100 py-2">
+                            <i class="fa-solid fa-filter-circle-xmark me-2"></i>Apply Telemetry
+                        </button>
+                        <a href="{% url 'products:list' %}" class="btn btn-cyber-outline w-100 py-2 text-center">Reset Filter</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Product Listing Grid -->
+        <div class="col-lg-9">
+            <!-- Active Search Summary -->
+            {% if params.q or params.category or params.brand %}
+                <div class="glass-panel p-3 mb-4 border-neon-blue d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    <div>
+                        <span class="text-muted">Filtering for: </span>
+                        {% if params.q %}<span class="badge bg-dark border border-info text-info p-2 me-1">Keyword: "{{ params.q }}"</span>{% endif %}
+                        {% if params.category %}<span class="badge bg-dark border border-purple text-purple p-2 me-1">Category: {{ params.category }}</span>{% endif %}
+                        {% if params.brand %}<span class="badge bg-dark border border-warning text-warning p-2 me-1">Brand: {{ params.brand }}</span>{% endif %}
+                    </div>
+                    <a href="{% url 'products:list' %}" class="small text-danger text-decoration-none fw-bold"><i class="fa-solid fa-xmark me-1"></i>Clear all filters</a>
+                </div>
+            {% endif %}
+
+            <!-- Products Array -->
+            <div class="row g-4">
+                {% for prod in products %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="glass-panel p-3 h-100 border-neon-purple d-flex flex-column position-relative">
+                            
+                            <!-- Wishlist Toggle Icon -->
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'products:toggle_wishlist' prod.id %}?next=products:list" class="position-absolute btn p-0 text-center d-flex align-items-center justify-content-center" style="top: 20px; right: 20px; z-index: 10; width: 35px; height: 35px; border-radius: 50%; background: rgba(5,5,8,0.7); border: 1px solid rgba(168,85,247,0.3);">
+                                    <i class="fa-heart fa-solid text-danger"></i>
+                                </a>
+                            {% endif %}
+
+                            <!-- Product Thumbnail -->
+                            <div class="position-relative mb-3 overflow-hidden rounded animate-scale" style="height: 180px;">
+                                <img src="{{ prod.image_url }}" alt="{{ prod.name }}" class="w-100 h-100" style="object-fit: cover;">
+                                {% if prod.stock == 0 %}
+                                    <span class="position-absolute top-2 start-2 badge bg-danger text-uppercase brand-font">OUT OF STOCK</span>
+                                {% elif prod.stock <= 5 %}
+                                    <span class="position-absolute top-2 start-2 badge bg-warning text-dark text-uppercase brand-font">ONLY {{ prod.stock }} LEFT</span>
+                                {% endif %}
+                                <span class="position-absolute bottom-2 start-2 badge bg-dark border border-secondary text-info brand-font">${{ prod.price }}</span>
+                            </div>
+
+                            <!-- Header Specifications -->
+                            <div class="mb-3 flex-grow-1">
+                                <span class="small text-info brand-font">{{ prod.brand.name }}</span>
+                                <h5 class="text-white mb-2 text-truncate" title="{{ prod.name }}">{{ prod.name }}</h5>
+                                <p class="small text-muted text-truncate">{{ prod.description }}</p>
+
+                                <!-- Badge items -->
+                                <div class="mt-2">
+                                    {% if prod.socket_type %}
+                                        <span class="spec-badge spec-badge-blue">{{ prod.socket_type }}</span>
+                                    {% endif %}
+                                    {% if prod.ram_type %}
+                                        <span class="spec-badge">{{ prod.ram_type }}</span>
+                                    {% endif %}
+                                    {% if prod.storage_type %}
+                                        <span class="spec-badge spec-badge-blue">{{ prod.storage_type }}</span>
+                                    {% endif %}
+                                    {% if prod.wattage > 0 %}
+                                        <span class="spec-badge">{{ prod.wattage }}W</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Cart Addition action footer -->
+                            <div class="mt-auto pt-3 border-top border-secondary d-flex gap-2">
+                                <a href="{% url 'products:detail' prod.slug %}" class="btn btn-cyber-outline flex-grow-1 text-center py-2" style="font-size: 11px;">Specs</a>
+                                {% if prod.stock > 0 %}
+                                    <form action="{% url 'cart:add' prod.id %}?next=products:list" method="POST" class="flex-grow-2 w-100">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-rgb w-100 py-2 d-flex align-items-center justify-content-center gap-1" style="font-size: 11px;">
+                                            <i class="fa-solid fa-cart-plus"></i>Add to Cart
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <button class="btn btn-secondary w-100 py-2 disabled" style="font-size: 11px;"><i class="fa-solid fa-ban me-1"></i>Out</button>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12 text-center py-5 glass-panel border-neon-blue">
+                        <i class="fa-solid fa-magnifying-glass-minus fa-5x text-muted mb-4 pulsate"></i>
+                        <h3 class="brand-font text-white">No Matching Hardware</h3>
+                        <p class="text-muted fs-5">We couldn't detect any peripherals in our depot matching your telemetry query parameters.</p>
+                        <a href="{% url 'products:list' %}" class="btn btn-rgb px-4 py-2 mt-2">Reset search filter</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

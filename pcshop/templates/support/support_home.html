@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | Customer Support & FAQ Nexus{% endblock %}
+
+{% block content %}
+
+<!-- Header Page Banner -->
+<section class="py-4 bg-dark border-bottom border-secondary mb-5" style="background: linear-gradient(180deg, #050508 0%, var(--bg-dark) 100%);">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-info text-decoration-none small">Home</a></li>
+                <li class="breadcrumb-item active text-white small" aria-current="page">Support Center</li>
+            </ol>
+        </nav>
+        <h1 class="brand-font text-white mb-0 text-uppercase"><i class="fa-solid fa-headset me-2 text-info"></i>Support Center</h1>
+    </div>
+</section>
+
+<!-- Support Hub Grid -->
+<div class="container my-5">
+    <div class="row g-5">
+        
+        <!-- Left Side: Interactive FAQ Accordion -->
+        <div class="col-lg-7">
+            <div class="glass-panel p-4 border-neon-blue h-100">
+                <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-circle-question me-2"></i>Frequently Asked Diagnostics</h3>
+                
+                <div class="accordion accordion-flush" id="faqAccordion">
+                    {% for faq in faqs %}
+                        <div class="accordion-item bg-transparent text-white border-bottom border-secondary py-2">
+                            <h2 class="accordion-header" id="heading_{{ faq.id }}">
+                                <button class="accordion-button collapsed bg-transparent text-info brand-font fs-6 px-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ faq.id }}" aria-expanded="false" aria-controls="collapse_{{ faq.id }}" style="box-shadow: none;">
+                                    <i class="fa-solid fa-circle-notch me-2 text-purple pulsate"></i>{{ faq.question }}
+                                </button>
+                            </h2>
+                            <div id="collapse_{{ faq.id }}" class="accordion-collapse collapse" aria-labelledby="heading_{{ faq.id }}" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body px-0 text-muted" style="font-size: 14px; line-height: 1.6;">
+                                    {{ faq.answer }}
+                                    <div class="mt-3">
+                                        <span class="badge bg-dark border border-secondary text-white">{{ faq.category }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-comments-question fa-4x mb-3 text-muted"></i>
+                            <p class="mb-0">No diagnostics registered. Seed data using command.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Forms (Support ticket or general inquiries) -->
+        <div class="col-lg-5">
+            {% if user.is_authenticated %}
+                <!-- Logged-in user ticket creation -->
+                <div class="glass-panel p-4 border-neon-purple h-100">
+                    <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-ticket me-2"></i>Generate Support Ticket</h3>
+                    <p class="small text-muted mb-4">Lodge a tech support, order query, or system complaint ticket directly in our telemetry registry database.</p>
+                    
+                    <form action="{% url 'support:create_ticket' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label brand-font text-white small">Topic Subject</label>
+                            <input type="text" name="subject" class="form-control form-cyber text-white py-2" placeholder="Briefly describe query..." required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label brand-font text-white small">Category Classification</label>
+                            <select name="category" class="form-select form-cyber text-white py-2" required style="font-family: 'Orbitron', sans-serif;">
+                                <option value="Technical">⚙️ Technical Support & Diagnostics</option>
+                                <option value="Order">📦 Order Logistics / Billing Problem</option>
+                                <option value="Builder">🛠️ PC Builder Configurator Question</option>
+                                <option value="General">Inquiry / Other Feedback</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label brand-font text-white small">Complete Description</label>
+                            <textarea name="description" class="form-control form-cyber text-white" rows="4" placeholder="Detail hardware issues, component part numbers, or complaints here..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-rgb w-100 py-3">
+                            <i class="fa-solid fa-paper-plane me-2"></i>Lodge Ticket Protocol
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <!-- Guest Contact Inquiry -->
+                <div class="glass-panel p-4 border-neon-purple h-100">
+                    <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-headset me-2"></i>Contact Androids</h3>
+                    <p class="small text-muted mb-4">Anonymous pilots can dispatch inquiries directly to our support nexus.</p>
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label brand-font text-white small">Your Pilot Name</label>
+                            <input type="text" name="name" class="form-control form-cyber text-white py-2" placeholder="Input alias..." required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label brand-font text-white small">Contact Email Coordinates</label>
+                            <input type="email" name="email" class="form-control form-cyber text-white py-2" placeholder="email@example.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label brand-font text-white small">Subject</label>
+                            <input type="text" name="subject" class="form-control form-cyber text-white py-2" placeholder="Inquiry subject..." required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label brand-font text-white small">Message Transmission</label>
+                            <textarea name="message" class="form-control form-cyber text-white" rows="3" placeholder="Enter message text here..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-rgb w-100 py-3">
+                            <i class="fa-solid fa-tower-broadcast me-2"></i>Transmit Signal
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

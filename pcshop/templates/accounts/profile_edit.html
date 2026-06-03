@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | Modify Telemetry Signature{% endblock %}
+
+{% block content %}
+
+<div class="container my-5 py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="glass-panel p-5 border-neon-blue live-glow">
+                
+                <div class="text-center mb-5">
+                    <i class="fa-solid fa-user-gear fa-4x text-info mb-3 pulsate"></i>
+                    <h2 class="brand-font text-white text-uppercase">TELEMETRY REGISTRY</h2>
+                    <p class="small text-muted">Modify signature avatar, cell parameters, and bio description tags.</p>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small" for="phone"><i class="fa-solid fa-mobile-retro me-2 text-info"></i>Cell Number</label>
+                        <input type="text" name="phone" id="phone" class="form-control form-cyber text-white py-2" placeholder="Modify number..." value="{{ profile.phone }}">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small" for="bio"><i class="fa-solid fa-signature me-2 text-info"></i>Signature Profile bio</label>
+                        <textarea name="bio" id="bio" class="form-control form-cyber text-white" rows="4" placeholder="Briefly describe your hardware expertise...">{{ profile.bio }}</textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small" for="avatar"><i class="fa-solid fa-circle-user me-2 text-info"></i>Avatar Telemetry Icon</label>
+                        <input type="file" name="avatar" id="avatar" class="form-control form-cyber text-white">
+                        <span class="small text-muted" style="font-size: 10px;">Select png/jpeg telemetry icon block.</span>
+                    </div>
+
+                    <button type="submit" class="btn btn-rgb w-100 py-3 mt-3">
+                        <i class="fa-solid fa-shield-halved me-2"></i>Update Telemetry Registry
+                    </button>
+                    <a href="{% url 'accounts:dashboard' %}" class="btn btn-cyber-outline w-100 py-2 mt-2 text-center">Abort protocol</a>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

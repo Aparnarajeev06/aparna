@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | Order Telemetry Lock Successful{% endblock %}
+
+{% block content %}
+
+<div class="container my-5 py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 text-center">
+            
+            <div class="glass-panel p-5 border-neon-blue live-glow">
+                
+                <div class="d-inline-flex align-items-center justify-content-center bg-dark border border-success mb-4 rounded-circle pulsate" style="width: 100px; height: 100px; box-shadow: 0 0 20px rgba(40,167,69,0.4);">
+                    <i class="fa-solid fa-clipboard-check fa-4x text-success"></i>
+                </div>
+                
+                <h2 class="brand-font text-white display-5 mb-3 text-uppercase">Telemetry Lock Complete</h2>
+                <h4 class="brand-font text-info mb-4">Your Gaming Order Has Been Logged!</h4>
+                
+                <p class="text-muted fs-6 mb-5" style="max-width: 600px; margin: 0 auto;">
+                    We have successfully captured your transaction and verified payment authentication. Your custom PC hardware is being compiled at our nexus shipping deck for express dispatch.
+                </p>
+
+                <!-- Order telemetries card summary -->
+                <div class="row g-3 mb-5 text-start justify-content-center">
+                    <div class="col-md-8">
+                        <div class="p-4 bg-dark rounded border border-secondary" style="background: rgba(10,10,12,0.65);">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Tracking Identifier:</span>
+                                <strong class="text-info brand-font" style="font-size: 14px;">{{ order.tracking_number }}</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Transaction Tally:</span>
+                                <strong class="text-white">${{ order.total_price }}</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Shipping Destination:</span>
+                                <span class="small text-white text-truncate text-end" style="max-width: 250px;">{{ order.shipping_address }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted small">Estimated Delivery:</span>
+                                <strong class="text-success small">3-5 Business Days</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
+                    <a href="{% url 'orders:detail' order.tracking_number %}" class="btn btn-rgb px-4 py-3"><i class="fa-solid fa-receipt me-2"></i>Review Receipt Specs</a>
+                    <a href="{% url 'accounts:dashboard' %}" class="btn btn-cyber-outline px-4 py-3"><i class="fa-solid fa-sliders me-2"></i>My Telemetry Dashboard</a>
+                    <a href="{% url 'products:list' %}" class="btn btn-cyber-outline px-4 py-3"><i class="fa-solid fa-store me-2"></i>Return to Catalog</a>
+                </div>
+
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+{% endblock %}

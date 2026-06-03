@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | Checkout Protocol{% endblock %}
+
+{% block content %}
+
+<!-- Header Page Banner -->
+<section class="py-4 bg-dark border-bottom border-secondary mb-5" style="background: linear-gradient(180deg, #050508 0%, var(--bg-dark) 100%);">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-info text-decoration-none small">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'cart:detail' %}" class="text-info text-decoration-none small">Shopping Cart</a></li>
+                <li class="breadcrumb-item active text-white small" aria-current="page">Checkout</li>
+            </ol>
+        </nav>
+        <h1 class="brand-font text-white mb-0 text-uppercase"><i class="fa-solid fa-credit-card me-2 text-info"></i>Checkout Protocol</h1>
+    </div>
+</section>
+
+<!-- Checkout Grid -->
+<div class="container my-5">
+    <form method="POST" action="{% url 'orders:checkout' %}">
+        {% csrf_token %}
+        <div class="row g-5">
+            
+            <!-- Left Side: Shipping Address & Payment Telemetry -->
+            <div class="col-lg-8">
+                
+                <!-- Shipping Address Registry Selection -->
+                <div class="glass-panel p-4 border-neon-purple mb-4">
+                    <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-map-location-dot me-2"></i>1. Shipping Destination</h3>
+                    
+                    {% if addresses %}
+                        <div class="row g-3 mb-4">
+                            <label class="form-label brand-font text-white small d-block">Select Registered Address:</label>
+                            {% for addr in addresses %}
+                                <div class="col-md-6">
+                                    <div class="glass-panel p-3 border-secondary h-100 bg-dark position-relative" style="background: rgba(10,10,12,0.4);">
+                                        <input class="form-check-input position-absolute" type="radio" name="address_id" id="addr_{{ addr.id }}" value="{{ addr.id }}" {% if addr.is_default %}checked{% endif %} style="top: 15px; right: 15px;">
+                                        <label class="form-check-label w-100 pe-4" for="addr_{{ addr.id }}">
+                                            <span class="badge {% if addr.is_default %}bg-info text-dark{% else %}bg-secondary text-white{% endif %} mb-2 brand-font" style="font-size: 8px;">
+                                                {% if addr.is_default %}Default destination{% else %}Secondary{% endif %}
+                                            </span>
+                                            <div class="small text-white fw-bold">{{ addr.street }}</div>
+                                            <div class="small text-muted mt-1">{{ addr.city }}, {{ addr.state }} {{ addr.postal_code }}</div>
+                                            <div class="small text-muted">{{ addr.country }}</div>
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            <div class="col-12 mt-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="address_id" id="addr_new" value="">
+                                    <label class="form-check-label small text-info fw-bold" for="addr_new">Ship to a new address instead...</label>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- New Address Form (Shown or managed inline) -->
+                    <div id="newAddressContainer" class="{% if addresses %}d-none{% endif %} border-top border-secondary pt-3 mt-3">
+                        <h6 class="brand-font text-white small mb-3">New Shipping Address Parameters</h6>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label brand-font text-white small">Street Address</label>
+                                <input type="text" name="street" class="form-control form-cyber text-white py-2" placeholder="Input delivery address..." id="new_street">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label brand-font text-white small">City</label>
+                                <input type="text" name="city" class="form-control form-cyber text-white py-2" placeholder="Input city..." id="new_city">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label brand-font text-white small">State/Province</label>
+                                <input type="text" name="state" class="form-control form-cyber text-white py-2" placeholder="Input state..." id="new_state">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label brand-font text-white small">Postal Code</label>
+                                <input type="text" name="postal_code" class="form-control form-cyber text-white py-2" placeholder="Input zip code..." id="new_postal_code">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label brand-font text-white small">Country</label>
+                                <input type="text" name="country" class="form-control form-cyber text-white py-2" value="USA" id="new_country">
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="save_address" value="true" id="saveAddressCheck" checked>
+                                    <label class="form-check-label small text-muted" for="saveAddressCheck">Save address registry inside profile telemetry book for future transactions</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment details mockup -->
+                <div class="glass-panel p-4 border-neon-blue mb-4">
+                    <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-wallet me-2"></i>2. Cyber Payment Telemetry</h3>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label brand-font text-white small">Primary Cardholder Name</label>
+                            <input type="text" class="form-control form-cyber text-white py-2" placeholder="Pilot alias..." value="{{ user.username|upper }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label brand-font text-white small">Card Telemetry Number</label>
+                            <input type="text" class="form-control form-cyber text-white py-2" placeholder="4242 •••• •••• ••••" required style="font-family: 'Orbitron', sans-serif;">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label brand-font text-white small">Expiration date</label>
+                            <input type="text" class="form-control form-cyber text-white py-2" placeholder="MM/YY" required style="font-family: 'Orbitron', sans-serif;">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label brand-font text-white small">CVC Code</label>
+                            <input type="password" class="form-control form-cyber text-white py-2" placeholder="•••" required style="font-family: 'Orbitron', sans-serif;">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Side: Order Tally Summary & Placing triggers -->
+            <div class="col-lg-4">
+                <div class="glass-panel p-4 border-neon-blue h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-list-check me-2"></i>Order Summary</h3>
+                        
+                        <!-- Order item summaries -->
+                        <div class="mb-4 overflow-y-auto" style="max-height: 250px;">
+                            {% for item in cart.items.all %}
+                                <div class="glass-panel p-2 mb-2 border-secondary bg-dark d-flex gap-3 align-items-center" style="background: rgba(10,10,12,0.4);">
+                                    <img src="{{ item.product.image_url }}" alt="thumb" class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                                    <div class="flex-grow-1 overflow-hidden" style="font-size: 12px;">
+                                        <div class="fw-bold text-white text-truncate">{{ item.product.name }}</div>
+                                        <div class="text-muted mt-1">{{ item.quantity }} x ${{ item.product.price }}</div>
+                                    </div>
+                                    <div class="brand-font text-info fw-bold" style="font-size: 12px;">${{ item.total_price }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Calculations -->
+                        <div class="p-3 bg-dark rounded border border-secondary mb-4" style="background: rgba(10,10,12,0.4);">
+                            <div class="d-flex justify-content-between mb-2 small">
+                                <span class="text-muted">Hardware Sum:</span>
+                                <span class="fw-bold text-white">${{ cart.total_price }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2 small">
+                                <span class="text-muted">Cyber Shipping:</span>
+                                <span class="text-success fw-bold">FREE PROMO</span>
+                            </div>
+                            <div class="d-flex justify-content-between border-top border-secondary pt-3">
+                                <span class="brand-font text-white">Aggregated Total:</span>
+                                <span class="brand-font text-info fs-4 fw-bold" style="text-shadow: 0 0 10px rgba(0,229,255,0.3);">${{ cart.total_price }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Place Order Buttons -->
+                    <div class="border-top border-secondary pt-4">
+                        <button type="submit" class="btn btn-rgb py-3 w-100 fs-5 d-flex align-items-center justify-content-center gap-2">
+                            <i class="fa-solid fa-circle-check"></i>Lock Telemetry Order
+                        </button>
+                        <a href="{% url 'cart:detail' %}" class="btn btn-cyber-outline py-2 w-100 text-center mt-3"><i class="fa-solid fa-arrow-left me-2"></i>Return to bays</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addrRadios = document.querySelectorAll('input[name="address_id"]');
+        const newAddrContainer = document.getElementById('newAddressContainer');
+        const newStreetInput = document.getElementById('new_street');
+        const newCityInput = document.getElementById('new_city');
+        const newStateInput = document.getElementById('new_state');
+        const newPostalInput = document.getElementById('new_postal_code');
+        const newCountryInput = document.getElementById('new_country');
+
+        function toggleNewAddress() {
+            let selectedRadio = document.querySelector('input[name="address_id"]:checked');
+            if (selectedRadio && selectedRadio.value === "") {
+                // Ship to new address
+                newAddrContainer.classList.remove('d-none');
+                newStreetInput.setAttribute('required', 'true');
+                newCityInput.setAttribute('required', 'true');
+                newStateInput.setAttribute('required', 'true');
+                newPostalInput.setAttribute('required', 'true');
+            } else {
+                newAddrContainer.classList.add('d-none');
+                newStreetInput.removeAttribute('required');
+                newCityInput.removeAttribute('required');
+                newStateInput.removeAttribute('required');
+                newPostalInput.removeAttribute('required');
+            }
+        }
+
+        addrRadios.forEach(radio => {
+            radio.addEventListener('change', toggleNewAddress);
+        });
+
+        // Add event listener to "Ship to a new address instead..." radio selector check
+        const addrNewRadio = document.getElementById('addr_new');
+        if (addrNewRadio) {
+            addrNewRadio.addEventListener('change', toggleNewAddress);
+        }
+
+        // Initialize state
+        toggleNewAddress();
+    });
+</script>
+{% endblock %}

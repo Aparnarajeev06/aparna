@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | Select {{ category.name }}{% endblock %}
+
+{% block content %}
+
+<!-- Header Page Banner -->
+<section class="py-4 bg-dark border-bottom border-secondary mb-5" style="background: linear-gradient(180deg, #050508 0%, var(--bg-dark) 100%);">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-info text-decoration-none small">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'builder:configurator' %}" class="text-info text-decoration-none small">PC Builder</a></li>
+                    <li class="breadcrumb-item active text-white small" aria-current="page">Select {{ category.name }}</li>
+                </ol>
+            </nav>
+            <h1 class="brand-font text-white mb-0 text-uppercase h2">Lock {{ category.name }}</h1>
+        </div>
+        <div class="d-flex gap-2">
+            <!-- Dynamic compatibility filtering toggle button -->
+            {% if category.slug == 'motherboards' and build.cpu %}
+                <a href="{% url 'builder:select_part' category.slug %}?compatible_only={% if compatible_only %}false{% else %}true{% endif %}" class="btn {% if compatible_only %}btn-rgb{% else %}btn-cyber-outline{% endif %} py-2 px-3">
+                    <i class="fa-solid fa-shield-halved me-2"></i>{% if compatible_only %}Show All Motherboards{% else %}Filter Socket: {{ build.cpu.socket_type }} Only{% endif %}
+                </a>
+            {% elif category.slug == 'cpus' and build.motherboard %}
+                <a href="{% url 'builder:select_part' category.slug %}?compatible_only={% if compatible_only %}false{% else %}true{% endif %}" class="btn {% if compatible_only %}btn-rgb{% else %}btn-cyber-outline{% endif %} py-2 px-3">
+                    <i class="fa-solid fa-shield-halved me-2"></i>{% if compatible_only %}Show All CPUs{% else %}Filter Socket: {{ build.motherboard.socket_type }} Only{% endif %}
+                </a>
+            {% elif category.slug == 'ram' and build.motherboard %}
+                <a href="{% url 'builder:select_part' category.slug %}?compatible_only={% if compatible_only %}false{% else %}true{% endif %}" class="btn {% if compatible_only %}btn-rgb{% else %}btn-cyber-outline{% endif %} py-2 px-3">
+                    <i class="fa-solid fa-shield-halved me-2"></i>{% if compatible_only %}Show All RAM{% else %}Filter: {{ build.motherboard.ram_type }} Only{% endif %}
+                </a>
+            {% endif %}
+            <a href="{% url 'builder:configurator' %}" class="btn btn-cyber-outline py-2 px-4"><i class="fa-solid fa-angle-left me-2"></i>Back to rig</a>
+        </div>
+    </div>
+</section>
+
+<!-- Selector Options Grid -->
+<div class="container my-5">
+    <div class="row g-4">
+        {% for prod in products %}
+            <div class="col-md-6 col-lg-4">
+                <div class="glass-panel p-3 h-100 border-neon-purple d-flex flex-column justify-content-between">
+                    
+                    <!-- Part Image -->
+                    <div class="position-relative overflow-hidden rounded mb-3" style="height: 180px;">
+                        <img src="{{ prod.image_url }}" alt="{{ prod.name }}" class="w-100 h-100" style="object-fit: cover;">
+                        <span class="position-absolute bottom-2 start-2 badge bg-dark border border-secondary text-info brand-font">${{ prod.price }}</span>
+                    </div>
+
+                    <!-- Telemetry Data -->
+                    <div class="mb-3">
+                        <span class="small text-info brand-font">{{ prod.brand.name }}</span>
+                        <h5 class="text-white mb-2 text-truncate">{{ prod.name }}</h5>
+                        <p class="small text-muted text-truncate">{{ prod.description }}</p>
+
+                        <!-- Badges specs -->
+                        <div class="mt-2">
+                            {% if prod.socket_type %}
+                                <span class="spec-badge spec-badge-blue">Socket: {{ prod.socket_type }}</span>
+                            {% endif %}
+                            {% if prod.ram_type %}
+                                <span class="spec-badge">RAM: {{ prod.ram_type }}</span>
+                            {% endif %}
+                            {% if prod.storage_type %}
+                                <span class="spec-badge spec-badge-blue">{{ prod.storage_type }}</span>
+                            {% endif %}
+                            {% if prod.wattage > 0 %}
+                                <span class="spec-badge">{{ prod.wattage }}W</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Selection actions -->
+                    <div class="border-top border-secondary pt-3 mt-2 d-flex gap-2">
+                        <a href="{% url 'products:detail' prod.slug %}" class="btn btn-cyber-outline flex-grow-1 text-center py-2" style="font-size: 11px;">Part Specs</a>
+                        <a href="{% url 'builder:add_part' prod.id %}" class="btn btn-rgb w-100 py-2 d-flex align-items-center justify-content-center gap-1" style="font-size: 11px;">
+                            <i class="fa-solid fa-circle-check"></i>Lock to rig
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center py-5 glass-panel border-neon-blue">
+                <i class="fa-solid fa-box-open fa-5x text-muted mb-4 pulsate"></i>
+                <h3 class="brand-font text-white">No telemetry components available</h3>
+                <p class="text-muted">We couldn't detect any compatible parts in the database.</p>
+                <a href="{% url 'builder:select_part' category.slug %}" class="btn btn-rgb px-4 py-2 mt-2">Show all parts</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

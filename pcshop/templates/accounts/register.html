@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | Create System Account{% endblock %}
+
+{% block content %}
+
+<div class="container my-5 py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="glass-panel p-5 border-neon-purple live-glow">
+                
+                <div class="text-center mb-5">
+                    <i class="fa-solid fa-user-plus fa-4x text-info mb-3 pulsate"></i>
+                    <h2 class="brand-font text-white text-uppercase">PILOT REGISTRY</h2>
+                    <p class="small text-muted">Register a new profile to start customizing gaming rigs.</p>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <!-- Form Errors if any -->
+                    {% if form.errors %}
+                        <div class="alert alert-danger glass-panel border-neon-pink p-3 mb-4" style="color: #fff; background: rgba(24, 24, 27, 0.9);">
+                            <ul class="mb-0 small">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li><strong>{{ field|title }}:</strong> {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label brand-font text-white small" for="id_username"><i class="fa-solid fa-user me-2 text-info"></i>Username</label>
+                            <input type="text" name="username" id="id_username" class="form-control form-cyber text-white py-2" placeholder="Choose system alias..." required autocomplete="username" value="{{ form.username.value|default:'' }}">
+                            <span class="small text-muted" style="font-size: 10px;">Unique letters, digits, and @/./+/-/_ characters.</span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label brand-font text-white small" for="id_password1"><i class="fa-solid fa-key me-2 text-info"></i>Passcode</label>
+                            <input type="password" name="password1" id="id_password1" class="form-control form-cyber text-white py-2" placeholder="Minimum 8 characters..." required autocomplete="new-password">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label brand-font text-white small" for="id_password2"><i class="fa-solid fa-shield-halved me-2 text-info"></i>Confirm Passcode</label>
+                            <input type="password" name="password2" id="id_password2" class="form-control form-cyber text-white py-2" placeholder="Repeat passcode..." required autocomplete="new-password">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label brand-font text-white small" for="phone"><i class="fa-solid fa-phone me-2 text-info"></i>Phone Number</label>
+                            <input type="text" name="phone" id="phone" class="form-control form-cyber text-white py-2" placeholder="Contact number (optional)">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-rgb w-100 py-3 mt-4">
+                        <i class="fa-solid fa-user-check me-2"></i>Create System Account
+                    </button>
+                </form>
+
+                <hr class="my-4" style="background-color: var(--neon-purple); opacity: 0.25;">
+
+                <div class="text-center">
+                    <p class="small text-muted mb-2">Already registered in the system?</p>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-cyber-outline w-100 py-2">Pilot Portal Login</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

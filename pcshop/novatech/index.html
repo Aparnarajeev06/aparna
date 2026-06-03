@@ -1,0 +1,108 @@
+{% load strict %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Tech</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">NOVA TECH</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Products</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">PC Builder</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Deals</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Support</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Login</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Cart</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="container text-center">
+        <h1>Build Your Ultimate Gaming Rig</h1>
+        <p>High-performance gaming PCs, components, and accessories.</p>
+
+        <button class="btn btn-custom">Shop Now</button>
+        <button class="btn btn-custom">Build PC</button>
+    </div>
+</section>
+
+<section class="container">
+    <h2 class="section-title">Featured Categories</h2>
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="category-card text-center">
+                <h4>CPUs</h4>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="category-card text-center">
+                <h4>GPUs</h4>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="category-card text-center">
+                <h4>RAM</h4>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<section class="container">
+    <h2 class="section-title">Trending Products</h2>
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="product-card">
+                <img src="https://images.unsplash.com/photo-1591488320449-011701bb6704?q=80&w=1470&auto=format&fit=crop">
+
+                <h4 class="mt-3">RTX 4090 GPU</h4>
+
+                <p>24GB Gaming Graphics Card</p>
+
+                <button class="btn btn-custom w-100">
+                    Add to Cart
+                </button>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<footer>
+    <div class="container text-center">
+        <h4>NOVA TECH</h4>
+        <p>Your ultimate destination for gaming hardware.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/script.js"></script>
+
+</body>
+</html>

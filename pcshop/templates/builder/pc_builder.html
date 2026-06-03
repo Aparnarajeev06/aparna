@@ -1,0 +1,325 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | Interactive custom PC Builder{% endblock %}
+
+{% block content %}
+
+<!-- Header Page Banner -->
+<section class="py-4 bg-dark border-bottom border-secondary mb-5" style="background: linear-gradient(180deg, #050508 0%, var(--bg-dark) 100%);">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-info text-decoration-none small">Home</a></li>
+                    <li class="breadcrumb-item active text-white small" aria-current="page">PC Builder configurator</li>
+                </ol>
+            </nav>
+            <h1 class="brand-font text-white mb-0 text-uppercase h2"><i class="fa-solid fa-screwdriver-wrench me-2 text-info"></i>Rig configurator</h1>
+        </div>
+        <a href="{% url 'builder:ai_recommendation' %}" class="btn btn-cyber-outline py-2 px-4"><i class="fa-solid fa-robot me-2"></i>Boot AI Recommendation</a>
+    </div>
+</section>
+
+<!-- PC Builder Grid -->
+<div class="container my-5">
+    <div class="row g-5">
+        
+        <!-- Step-by-step Parts slots -->
+        <div class="col-lg-8">
+            <div class="glass-panel p-4 border-neon-purple mb-4">
+                <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2">Hardware Configurator Slots</h3>
+                
+                <div class="table-responsive">
+                    <table class="table table-cyber text-white mb-0" style="vertical-align: middle; font-size: 14px;">
+                        <thead>
+                            <tr>
+                                <th>Step Component</th>
+                                <th>Locked Hardware Part</th>
+                                <th>Wattage</th>
+                                <th>Price</th>
+                                <th class="text-end">Telemetry Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <!-- CPU Row -->
+                            <tr>
+                                <td class="brand-font text-info fw-bold">01. CPU</td>
+                                <td>
+                                    {% if build.cpu %}
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="{{ build.cpu.image_url }}" alt="cpu" class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                                            <div>
+                                                <div class="fw-bold">{{ build.cpu.name }}</div>
+                                                <span class="spec-badge spec-badge-blue">{{ build.cpu.socket_type }}</span>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted"><i class="fa-solid fa-microchip me-2"></i>No processor locked</span>
+                                    {% endif %}
+                                </td>
+                                <td>{% if build.cpu %}{{ build.cpu.wattage }}W{% else %}-{% endif %}</td>
+                                <td class="brand-font">{% if build.cpu %}${{ build.cpu.price }}{% else %}-{% endif %}</td>
+                                <td class="text-end">
+                                    {% if build.cpu %}
+                                        <div class="d-flex gap-2 justify-content-end">
+                                            <a href="{% url 'builder:select_part' 'cpus' %}" class="btn btn-cyber-outline btn-sm py-1 px-2" style="font-size: 11px;">Swap</a>
+                                            <a href="{% url 'builder:remove_part' 'cpu' %}" class="btn btn-cyber-danger btn-sm py-1 px-2" style="font-size: 11px;">Clear</a>
+                                        </div>
+                                    {% else %}
+                                        <a href="{% url 'builder:select_part' 'cpus' %}" class="btn btn-rgb btn-sm py-1 px-3" style="font-size: 11px;"><i class="fa-solid fa-plus me-1"></i>Lock CPU</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <!-- Motherboard Row -->
+                            <tr>
+                                <td class="brand-font text-info fw-bold">02. Motherboard</td>
+                                <td>
+                                    {% if build.motherboard %}
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="{{ build.motherboard.image_url }}" alt="board" class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                                            <div>
+                                                <div class="fw-bold">{{ build.motherboard.name }}</div>
+                                                <span class="spec-badge spec-badge-blue">{{ build.motherboard.socket_type }}</span>
+                                                <span class="spec-badge">{{ build.motherboard.ram_type }}</span>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted"><i class="fa-solid fa-server me-2"></i>No motherboard locked</span>
+                                    {% endif %}
+                                </td>
+                                <td>{% if build.motherboard %}{{ build.motherboard.wattage }}W{% else %}-{% endif %}</td>
+                                <td class="brand-font">{% if build.motherboard %}${{ build.motherboard.price }}{% else %}-{% endif %}</td>
+                                <td class="text-end">
+                                    {% if build.motherboard %}
+                                        <div class="d-flex gap-2 justify-content-end">
+                                            <a href="{% url 'builder:select_part' 'motherboards' %}" class="btn btn-cyber-outline btn-sm py-1 px-2" style="font-size: 11px;">Swap</a>
+                                            <a href="{% url 'builder:remove_part' 'motherboard' %}" class="btn btn-cyber-danger btn-sm py-1 px-2" style="font-size: 11px;">Clear</a>
+                                        </div>
+                                    {% else %}
+                                        <a href="{% url 'builder:select_part' 'motherboards' %}" class="btn btn-rgb btn-sm py-1 px-3" style="font-size: 11px;"><i class="fa-solid fa-plus me-1"></i>Lock Board</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <!-- RAM Row -->
+                            <tr>
+                                <td class="brand-font text-info fw-bold">03. RAM Memory</td>
+                                <td>
+                                    {% if build.ram %}
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="{{ build.ram.image_url }}" alt="ram" class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                                            <div>
+                                                <div class="fw-bold">{{ build.ram.name }}</div>
+                                                <span class="spec-badge">{{ build.ram.ram_type }}</span>
+                                                <span class="spec-badge spec-badge-blue">{{ build.ram.memory_size }}GB</span>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted"><i class="fa-solid fa-memory me-2"></i>No RAM modules locked</span>
+                                    {% endif %}
+                                </td>
+                                <td>{% if build.ram %}{{ build.ram.wattage }}W{% else %}-{% endif %}</td>
+                                <td class="brand-font">{% if build.ram %}${{ build.ram.price }}{% else %}-{% endif %}</td>
+                                <td class="text-end">
+                                    {% if build.ram %}
+                                        <div class="d-flex gap-2 justify-content-end">
+                                            <a href="{% url 'builder:select_part' 'ram' %}" class="btn btn-cyber-outline btn-sm py-1 px-2" style="font-size: 11px;">Swap</a>
+                                            <a href="{% url 'builder:remove_part' 'ram' %}" class="btn btn-cyber-danger btn-sm py-1 px-2" style="font-size: 11px;">Clear</a>
+                                        </div>
+                                    {% else %}
+                                        <a href="{% url 'builder:select_part' 'ram' %}" class="btn btn-rgb btn-sm py-1 px-3" style="font-size: 11px;"><i class="fa-solid fa-plus me-1"></i>Lock RAM</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <!-- GPU Row -->
+                            <tr>
+                                <td class="brand-font text-info fw-bold">04. GPU Graphics</td>
+                                <td>
+                                    {% if build.gpu %}
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="{{ build.gpu.image_url }}" alt="gpu" class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                                            <div>
+                                                <div class="fw-bold">{{ build.gpu.name }}</div>
+                                                <span class="spec-badge spec-badge-blue">{{ build.gpu.memory_size }}GB VRAM</span>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted"><i class="fa-solid fa-gamepad me-2"></i>No graphics card locked</span>
+                                    {% endif %}
+                                </td>
+                                <td>{% if build.gpu %}{{ build.gpu.wattage }}W{% else %}-{% endif %}</td>
+                                <td class="brand-font">{% if build.gpu %}${{ build.gpu.price }}{% else %}-{% endif %}</td>
+                                <td class="text-end">
+                                    {% if build.gpu %}
+                                        <div class="d-flex gap-2 justify-content-end">
+                                            <a href="{% url 'builder:select_part' 'gpus' %}" class="btn btn-cyber-outline btn-sm py-1 px-2" style="font-size: 11px;">Swap</a>
+                                            <a href="{% url 'builder:remove_part' 'gpu' %}" class="btn btn-cyber-danger btn-sm py-1 px-2" style="font-size: 11px;">Clear</a>
+                                        </div>
+                                    {% else %}
+                                        <a href="{% url 'builder:select_part' 'gpus' %}" class="btn btn-rgb btn-sm py-1 px-3" style="font-size: 11px;"><i class="fa-solid fa-plus me-1"></i>Lock GPU</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <!-- Storage Row -->
+                            <tr>
+                                <td class="brand-font text-info fw-bold">05. Storage Drive</td>
+                                <td>
+                                    {% if build.storage %}
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="{{ build.storage.image_url }}" alt="storage" class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                                            <div>
+                                                <div class="fw-bold">{{ build.storage.name }}</div>
+                                                <span class="spec-badge spec-badge-blue">{{ build.storage.storage_type }}</span>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted"><i class="fa-solid fa-hdd me-2"></i>No storage drive locked</span>
+                                    {% endif %}
+                                </td>
+                                <td>{% if build.storage %}{{ build.storage.wattage }}W{% else %}-{% endif %}</td>
+                                <td class="brand-font">{% if build.storage %}${{ build.storage.price }}{% else %}-{% endif %}</td>
+                                <td class="text-end">
+                                    {% if build.storage %}
+                                        <div class="d-flex gap-2 justify-content-end">
+                                            <a href="{% url 'builder:select_part' 'storage' %}" class="btn btn-cyber-outline btn-sm py-1 px-2" style="font-size: 11px;">Swap</a>
+                                            <a href="{% url 'builder:remove_part' 'storage' %}" class="btn btn-cyber-danger btn-sm py-1 px-2" style="font-size: 11px;">Clear</a>
+                                        </div>
+                                    {% else %}
+                                        <a href="{% url 'builder:select_part' 'storage' %}" class="btn btn-rgb btn-sm py-1 px-3" style="font-size: 11px;"><i class="fa-solid fa-plus me-1"></i>Lock Storage</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <!-- Power Supply Row -->
+                            <tr>
+                                <td class="brand-font text-info fw-bold">06. Power Supply</td>
+                                <td>
+                                    {% if build.psu %}
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="{{ build.psu.image_url }}" alt="psu" class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                                            <div>
+                                                <div class="fw-bold">{{ build.psu.name }}</div>
+                                                <span class="spec-badge spec-badge-blue">{{ build.psu.wattage }}W Capacity</span>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted"><i class="fa-solid fa-plug me-2"></i>No power supply locked</span>
+                                    {% endif %}
+                                </td>
+                                <td>-</td>
+                                <td class="brand-font">{% if build.psu %}${{ build.psu.price }}{% else %}-{% endif %}</td>
+                                <td class="text-end">
+                                    {% if build.psu %}
+                                        <div class="d-flex gap-2 justify-content-end">
+                                            <a href="{% url 'builder:select_part' 'power-supplies' %}" class="btn btn-cyber-outline btn-sm py-1 px-2" style="font-size: 11px;">Swap</a>
+                                            <a href="{% url 'builder:remove_part' 'psu' %}" class="btn btn-cyber-danger btn-sm py-1 px-2" style="font-size: 11px;">Clear</a>
+                                        </div>
+                                    {% else %}
+                                        <a href="{% url 'builder:select_part' 'power-supplies' %}" class="btn btn-rgb btn-sm py-1 px-3" style="font-size: 11px;"><i class="fa-solid fa-plus me-1"></i>Lock PSU</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Incompatibility & warning banners -->
+            {% if warnings %}
+                <div class="glass-panel p-4 border-neon-pink live-glow">
+                    <h4 class="brand-font text-danger mb-3"><i class="fa-solid fa-triangle-exclamation pulsate me-2"></i>Incompatibility Protocols Detected</h4>
+                    {% for w in warnings %}
+                        <div class="alert alert-dark border border-danger text-white mb-2" style="background: rgba(10,10,12,0.85); font-size: 13px;">
+                            {{ w }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Side: Watts gauge & Price aggregations -->
+        <div class="col-lg-4">
+            <div class="glass-panel p-4 border-neon-blue h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-chart-simple me-2"></i>Rig Diagnostic</h3>
+                    
+                    <!-- Wattage estimation bar -->
+                    <div class="p-3 bg-dark rounded border border-secondary mb-4" style="background: rgba(10,10,12,0.4);">
+                        <label class="form-label brand-font text-white small d-flex justify-content-between">
+                            <span>Power Requirements:</span>
+                            <span class="text-info">{{ total_wattage }} W</span>
+                        </label>
+                        <div class="progress bg-secondary border border-dark rounded-pill" style="height: 12px; overflow: hidden;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" 
+                                 style="width: {% if build.psu %}{{ total_wattage|add:0|filesizeformat }}{% else %}40%{% endif %};" 
+                                 aria-valuenow="{{ total_wattage }}" aria-valuemin="0" 
+                                 aria-valuemax="{% if build.psu %}{{ build.psu.wattage }}{% else %}800{% endif %}">
+                            </div>
+                        </div>
+                        {% if build.psu %}
+                            <div class="d-flex justify-content-between mt-2" style="font-size: 10px;">
+                                <span class="text-muted">Total Draw: ~{{ total_wattage }}W</span>
+                                <span class="text-info">PSU capacity: {{ build.psu.wattage }}W</span>
+                            </div>
+                        {% else %}
+                            <div class="mt-2 text-center" style="font-size: 10px; color: var(--neon-purple);">
+                                ⚠️ Lock a Power Supply to verify capacity safety.
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Compatibility diagnostic -->
+                    <div class="p-3 bg-dark rounded border border-secondary mb-4" style="background: rgba(10,10,12,0.4);">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small text-muted">Socket Compatibility:</span>
+                            {% if is_compatible %}
+                                <span class="badge bg-success border border-success small"><i class="fa-solid fa-shield-check me-1"></i>SECURE</span>
+                            {% else %}
+                                <span class="badge bg-danger border border-danger small"><i class="fa-solid fa-triangle-exclamation me-1"></i>ERRORS</span>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small text-muted">Active locked parts:</span>
+                            <span class="small text-white fw-bold">
+                                {% if build.cpu %}✔{% else %}❌{% endif %} CPU | 
+                                {% if build.motherboard %}✔{% else %}❌{% endif %} Board | 
+                                {% if build.ram %}✔{% else %}❌{% endif %} RAM
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="small text-muted">Estimated Tax:</span>
+                            <span class="small text-white text-success">Included</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aggregated totals and add to cart triggers -->
+                <div class="border-top border-secondary pt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="brand-font text-white">Aggregated Rig Cost:</span>
+                        <span class="brand-font text-info fs-3 fw-bold" style="text-shadow: 0 0 10px rgba(0,229,255,0.3);">${{ total_price }}</span>
+                    </div>
+                    
+                    {% if is_compatible and total_price > 0 %}
+                        <a href="{% url 'builder:add_to_cart' %}" class="btn btn-rgb w-100 py-3 fs-5 d-flex align-items-center justify-content-center gap-2">
+                            <i class="fa-solid fa-cart-arrow-down fs-4"></i>Migrate Rig to Cart
+                        </a>
+                    {% else %}
+                        <button class="btn btn-secondary w-100 py-3 disabled" style="font-size: 14px;">
+                            <i class="fa-solid fa-ban me-2"></i>Resolve Warnings to Buy
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

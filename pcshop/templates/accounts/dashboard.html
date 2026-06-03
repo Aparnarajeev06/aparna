@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | User Control Telemetry{% endblock %}
+
+{% block content %}
+
+<!-- Header Page Banner -->
+<section class="py-4 bg-dark border-bottom border-secondary mb-5" style="background: linear-gradient(180deg, #050508 0%, var(--bg-dark) 100%);">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h1 class="brand-font text-white mb-0 text-uppercase"><i class="fa-solid fa-gauge-high me-2 text-info"></i>User Dashboard</h1>
+            <p class="small text-muted mb-0">Pilot Session: <strong class="text-white">{{ user.username }}</strong> • Status: Operational</p>
+        </div>
+        <a href="{% url 'accounts:profile_edit' %}" class="btn btn-cyber-outline py-2 px-4"><i class="fa-solid fa-user-pen me-2"></i>Edit Signature Profile</a>
+    </div>
+</section>
+
+<!-- Dashboard Main Grid -->
+<div class="container my-4">
+    <div class="row g-4">
+        
+        <!-- Left Column: User Telemetry Overview -->
+        <div class="col-lg-4">
+            <!-- Profile overview -->
+            <div class="glass-panel p-4 border-neon-blue mb-4 text-center">
+                <div class="d-inline-block bg-dark border border-info mb-3 rounded-circle overflow-hidden live-glow" style="width: 120px; height: 120px;">
+                    {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}" alt="avatar" class="w-100 h-100" style="object-fit: cover;">
+                    {% else %}
+                        <i class="fa-solid fa-user-astronaut fa-5x text-info mt-3 pulsate"></i>
+                    {% endif %}
+                </div>
+                <h3 class="brand-font text-white mb-1">{{ user.username }}</h3>
+                <p class="small text-info brand-font mb-3">ID: #NT-{{ user.id|stringformat:"04d" }}</p>
+                <div class="p-3 bg-dark rounded border border-secondary text-start mb-3" style="background: rgba(10,10,12,0.4);">
+                    <div class="small text-muted mb-1 brand-font">Signature Bio:</div>
+                    <p class="small text-white mb-0">{{ profile.bio|default:"No telemetry signature bio written yet." }}</p>
+                </div>
+                <div class="text-start small">
+                    <div class="text-muted"><i class="fa-solid fa-envelope me-2 text-info"></i>{{ user.email }}</div>
+                    <div class="text-muted mt-2"><i class="fa-solid fa-phone me-2 text-info"></i>{{ profile.phone|default:"No phone telemetry registered" }}</div>
+                </div>
+            </div>
+
+            <!-- Address Registry panel -->
+            <div class="glass-panel p-4 border-neon-purple mb-4">
+                <h4 class="brand-font text-info mb-3 border-bottom border-secondary pb-2"><i class="fa-solid fa-map-location-dot me-2"></i>Address Registry</h4>
+                
+                <div class="overflow-y-auto mb-4" style="max-height: 250px;">
+                    {% for addr in addresses %}
+                        <div class="glass-panel p-3 mb-2 border-secondary {% if addr.is_default %}border-neon-blue{% endif %}" style="background: rgba(10,10,12,0.4);">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge {% if addr.is_default %}bg-info text-dark{% else %}bg-secondary text-white{% endif %} brand-font" style="font-size: 9px;">
+                                    {% if addr.is_default %}Primary Address{% else %}Secondary{% endif %}
+                                </span>
+                                <div class="d-flex gap-2">
+                                    {% if not addr.is_default %}
+                                        <a href="{% url 'accounts:make_default_address' addr.id %}" class="small text-info text-decoration-none" title="Make default"><i class="fa-solid fa-star"></i></a>
+                                    {% endif %}
+                                    <a href="{% url 'accounts:delete_address' addr.id %}" class="small text-danger text-decoration-none" title="Delete"><i class="fa-solid fa-trash-can"></i></a>
+                                </div>
+                            </div>
+                            <p class="small text-white mb-1 fw-bold">{{ addr.street }}</p>
+                            <p class="small text-muted mb-0">{{ addr.city }}, {{ addr.state }} {{ addr.postal_code }}</p>
+                            <p class="small text-muted mb-0">{{ addr.country }}</p>
+                        </div>
+                    {% empty %}
+                        <p class="small text-muted text-center py-3">No delivery telemetry registered.</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Fast Address Submission Form -->
+                <form action="{% url 'accounts:add_address' %}" method="POST" class="border-top border-secondary pt-3">
+                    {% csrf_token %}
+                    <h6 class="brand-font text-white small mb-3">Register New Address</h6>
+                    <div class="mb-2">
+                        <input type="text" name="street" class="form-control form-cyber py-1 px-2 text-white" placeholder="Street address" required style="font-size: 12px;">
+                    </div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <input type="text" name="city" class="form-control form-cyber py-1 px-2 text-white" placeholder="City" required style="font-size: 12px;">
+                        </div>
+                        <div class="col-6">
+                            <input type="text" name="state" class="form-control form-cyber py-1 px-2 text-white" placeholder="State" required style="font-size: 12px;">
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <input type="text" name="postal_code" class="form-control form-cyber py-1 px-2 text-white" placeholder="Postal Code" required style="font-size: 12px;">
+                        </div>
+                        <div class="col-6">
+                            <input type="text" name="country" class="form-control form-cyber py-1 px-2 text-white" placeholder="Country" value="USA" style="font-size: 12px;">
+                        </div>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="is_default" value="true" id="isDefaultCheck">
+                        <label class="form-check-label small text-muted" for="isDefaultCheck">Mark as default delivery address</label>
+                    </div>
+                    <button type="submit" class="btn btn-rgb btn-sm w-100 py-2">Lock Address</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Column: Transactions & Interactions -->
+        <div class="col-lg-8">
+            
+            <!-- Order History list -->
+            <div class="glass-panel p-4 border-neon-purple mb-4">
+                <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-box-open me-2"></i>Telemetry Transactions</h3>
+                <div class="table-responsive">
+                    <table class="table table-cyber text-white mb-0" style="font-size: 13px;">
+                        <thead>
+                            <tr>
+                                <th>Order Number</th>
+                                <th>Price Total</th>
+                                <th>Payment</th>
+                                <th>Delivery Status</th>
+                                <th>Purchased Date</th>
+                                <th class="text-end">Telemetry Invoice</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ord in orders %}
+                                <tr>
+                                    <td class="brand-font text-info">{{ ord.tracking_number }}</td>
+                                    <td class="fw-bold">${{ ord.total_price }}</td>
+                                    <td>
+                                        <span class="badge bg-dark border {% if ord.payment_status == 'Paid' %}border-success text-success{% else %}border-danger text-danger{% endif %} py-1 px-2" style="font-size: 10px;">
+                                            {{ ord.payment_status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-dark border {% if ord.shipping_status == 'Delivered' %}border-success text-success{% elif ord.shipping_status == 'Cancelled' %}border-danger text-danger{% else %}border-warning text-warning{% endif %} py-1 px-2" style="font-size: 10px;">
+                                            {{ ord.shipping_status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ ord.created_at|date:"M d, Y" }}</td>
+                                    <td class="text-end">
+                                        <a href="{% url 'orders:detail' ord.tracking_number %}" class="btn btn-cyber-outline btn-sm py-1 px-3" style="font-size: 11px;"><i class="fa-solid fa-receipt me-1"></i>Receipt</a>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">No telemetry transaction records detected.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Support Tickets -->
+                <div class="col-md-6">
+                    <div class="glass-panel p-4 border-neon-blue h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom border-secondary pb-2">
+                            <h4 class="brand-font text-info mb-0" style="font-size: 16px;"><i class="fa-solid fa-headset me-2"></i>Active Tickets</h4>
+                            <a href="{% url 'support:home' %}" class="btn btn-cyber-outline btn-sm" style="font-size: 10px;">Open Ticket</a>
+                        </div>
+                        <div class="overflow-y-auto" style="max-height: 200px;">
+                            {% for tick in tickets %}
+                                <div class="p-2 mb-2 rounded bg-dark border border-secondary" style="background: rgba(10,10,12,0.4);">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="badge bg-dark border {% if tick.status == 'Open' %}border-info text-info{% else %}border-secondary text-muted{% endif %}" style="font-size: 8px;">{{ tick.status }}</span>
+                                        <span class="small text-muted" style="font-size: 9px;">{{ tick.created_at|date:"M d" }}</span>
+                                    </div>
+                                    <h6 class="small text-white text-truncate mb-1 fw-bold">{{ tick.subject }}</h6>
+                                    <a href="{% url 'support:ticket_detail' tick.id %}" class="small text-info text-decoration-none" style="font-size: 10px;">Join Dialogue <i class="fa-solid fa-angle-right ms-1"></i></a>
+                                </div>
+                            {% empty %}
+                                <p class="small text-muted text-center py-4">No logged tech support tickets.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RMA return queries -->
+                <div class="col-md-6">
+                    <div class="glass-panel p-4 border-neon-blue h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom border-secondary pb-2">
+                            <h4 class="brand-font text-info mb-0" style="font-size: 16px;"><i class="fa-solid fa-arrow-rotate-left me-2"></i>RMA Claims</h4>
+                            <span class="small text-muted" style="font-size: 10px;">Returns Portal</span>
+                        </div>
+                        <div class="overflow-y-auto" style="max-height: 200px;">
+                            {% for rma in rmas %}
+                                <div class="p-2 mb-2 rounded bg-dark border border-secondary" style="background: rgba(10,10,12,0.4);">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="badge bg-dark border {% if rma.status == 'Approved' %}border-success text-success{% elif rma.status == 'Pending' %}border-warning text-warning{% else %}border-danger text-danger{% endif %}" style="font-size: 8px;">{{ rma.status }}</span>
+                                        <span class="small text-muted" style="font-size: 9px;">{{ rma.created_at|date:"M d" }}</span>
+                                    </div>
+                                    <h6 class="small text-white text-truncate mb-1 fw-bold">{{ rma.order_item.product.name }}</h6>
+                                    <p class="small text-muted mb-0 text-truncate" style="font-size: 10px;">Reason: {{ rma.reason }}</p>
+                                </div>
+                            {% empty %}
+                                <p class="small text-muted text-center py-4">No active return RMA queries logged.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

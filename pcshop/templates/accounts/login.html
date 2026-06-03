@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | User Authorization Nexus{% endblock %}
+
+{% block content %}
+
+<div class="container my-5 py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-8">
+            <div class="glass-panel p-5 border-neon-blue live-glow">
+                
+                <div class="text-center mb-5">
+                    <i class="fa-solid fa-user-lock fa-4x text-info mb-3 pulsate"></i>
+                    <h2 class="brand-font text-white text-uppercase">NEXUS SIGN IN</h2>
+                    <p class="small text-muted">Input your authentication credentials to lock telemetry.</p>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small" for="id_username"><i class="fa-solid fa-terminal me-2 text-info"></i>Access Username</label>
+                        <input type="text" name="username" id="id_username" class="form-control form-cyber text-white py-2" placeholder="Input username..." required autocomplete="username">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small" for="id_password"><i class="fa-solid fa-key me-2 text-info"></i>Access Passcode</label>
+                        <input type="password" name="password" id="id_password" class="form-control form-cyber text-white py-2" placeholder="Input password..." required autocomplete="current-password">
+                    </div>
+
+                    <button type="submit" class="btn btn-rgb w-100 py-3 mt-3">
+                        <i class="fa-solid fa-right-to-bracket me-2"></i>Authorize Portal
+                    </button>
+                </form>
+
+                <hr class="my-4" style="background-color: var(--neon-purple); opacity: 0.25;">
+
+                <div class="text-center">
+                    <p class="small text-muted mb-2">New pilot in the system?</p>
+                    <a href="{% url 'accounts:register' %}" class="btn btn-cyber-outline w-100 py-2">Create Nexus Account</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

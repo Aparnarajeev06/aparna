@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | Initiate RMA Return Claim{% endblock %}
+
+{% block content %}
+
+<div class="container my-5 py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="glass-panel p-5 border-neon-blue live-glow">
+                
+                <div class="text-center mb-5">
+                    <i class="fa-solid fa-arrow-rotate-left fa-4x text-info mb-3 pulsate"></i>
+                    <h2 class="brand-font text-white text-uppercase">RMA INITIATION</h2>
+                    <p class="small text-muted">Submit return/warranty diagnostic claims for order item parts.</p>
+                </div>
+
+                <div class="p-3 bg-dark rounded border border-secondary text-start mb-4" style="background: rgba(10,10,12,0.65);">
+                    <div class="small text-muted mb-1 brand-font">Warranty Hardware Part:</div>
+                    <strong class="text-info" style="font-size: 14px;">{{ order_item.product.name }}</strong>
+                    <div class="small text-muted mt-1">Invoice Receipt: {{ order_item.order.tracking_number }} • Purchased price: ${{ order_item.price }}</div>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small" for="reason"><i class="fa-solid fa-triangle-exclamation me-2 text-info"></i>Defective reason diagnostic</label>
+                        <textarea name="reason" id="reason" class="form-control form-cyber text-white" rows="5" placeholder="Describe component malfunctions, booting faults, or damages in details here..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-rgb w-100 py-3">
+                        <i class="fa-solid fa-clipboard-check me-2"></i>Initiate RMA Warranty protocol
+                    </button>
+                    <a href="{% url 'accounts:dashboard' %}" class="btn btn-cyber-outline w-100 py-2 mt-2 text-center">Abort claim</a>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

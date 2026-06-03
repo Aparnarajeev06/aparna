@@ -1,0 +1,300 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | Build Your Ultimate Gaming Rig{% endblock %}
+
+{% block content %}
+
+<!-- Hero Banner Section -->
+<section class="hero-banner">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7 text-center text-lg-start">
+                <h1 class="display-3 mb-3 text-uppercase brand-font text-shadow" style="background: linear-gradient(to right, #ffffff, var(--neon-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    Build Your Ultimate Gaming Rig
+                </h1>
+                <p class="lead text-muted mb-4 fs-4" style="max-width: 600px;">
+                    Unlock absolute performance. Configure custom gaming systems, browse elite PC hardware, and equip your nexus with state-of-the-art accessories.
+                </p>
+                <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3">
+                    <a href="{% url 'products:list' %}" class="btn btn-rgb px-5 py-3 fs-5">
+                        <i class="fa-solid fa-store me-2"></i>Shop Now
+                    </a>
+                    <a href="{% url 'builder:configurator' %}" class="btn btn-cyber-outline px-5 py-3 fs-5">
+                        <i class="fa-solid fa-gamepad me-2"></i>Build PC
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="glass-panel p-4 text-center border-neon-blue live-glow" style="transform: rotate(2deg);">
+                    <i class="fa-solid fa-server fa-10x text-info mb-4 pulsate"></i>
+                    <h3 class="brand-font text-info">NOVA-1 QUANTUM</h3>
+                    <p class="small text-muted">RTX 4090 • Core i9-14900K • 32GB DDR5</p>
+                    <div class="text-warning fw-bold fs-4">$3,249.99</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Categories Grid -->
+<section class="container my-5 py-4">
+    <h2 class="text-center text-uppercase mb-5 brand-font text-shadow text-info">
+        <i class="fa-solid fa-network-wired me-2"></i>Featured Categories
+    </h2>
+    <div class="row g-4 justify-content-center">
+        {% for cat in featured_categories %}
+            <div class="col-lg-2 col-md-4 col-6">
+                <a href="{% url 'products:list' %}?category={{ cat.slug }}" class="text-decoration-none">
+                    <div class="glass-panel p-4 text-center h-100 border-neon-purple d-flex flex-column align-items-center justify-content-center">
+                        <div class="d-flex align-items-center justify-content-center bg-dark border border-secondary mb-3 rounded-circle" style="width: 70px; height: 70px;">
+                            <i class="fa-solid {{ cat.icon }} fa-2x text-info"></i>
+                        </div>
+                        <h5 class="brand-font text-white mb-0" style="font-size: 14px;">{{ cat.name }}</h5>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Promotional RTX Sale Banner -->
+{% if rtx_promo %}
+<section class="container my-5">
+    <div class="promo-banner glass-panel border-neon-blue p-5">
+        <div class="row align-items-center">
+            <div class="col-lg-8 text-center text-lg-start z-1">
+                <span class="badge bg-danger mb-3 px-3 py-2 text-uppercase fw-bold brand-font" style="letter-spacing: 2px;">Promotional Protocol</span>
+                <h2 class="display-5 brand-font text-white mb-3">NVIDIA GeForce RTX 4090</h2>
+                <h4 class="brand-font text-info mb-4">LOCK IN MAXIMUM SPECS AT NOVA TECH</h4>
+                <p class="text-muted fs-5 mb-4" style="max-width: 680px;">
+                    Experience real-time ray tracing, neural graphics acceleration, and blistering frame rates. This is the absolute apex of graphics compute hardware. Available now with immediate express delivery protocols.
+                </p>
+                <div class="d-flex flex-wrap justify-content-center justify-content-lg-start align-items-center gap-4">
+                    <div class="text-info fs-3 fw-bold" style="font-family: 'Orbitron', sans-serif;">${{ rtx_promo.price }}</div>
+                    <form action="{% url 'cart:add' rtx_promo.id %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-rgb px-4 py-3">
+                            <i class="fa-solid fa-cart-arrow-down me-2"></i>Lock This GPU
+                        </button>
+                    </form>
+                    <a href="{% url 'products:detail' rtx_promo.slug %}" class="btn btn-cyber-outline px-4 py-3">Specs Details</a>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center d-none d-lg-block z-1">
+                <img src="{{ rtx_promo.image_url }}" alt="RTX 4090" class="img-fluid rounded border-neon-purple live-glow" style="max-height: 280px; object-fit: cover;">
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Trending Products Cards -->
+<section class="container my-5 py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-5">
+        <h2 class="text-uppercase mb-0 brand-font text-shadow text-info">
+            <i class="fa-solid fa-fire-flame-simple me-2"></i>Trending Hardware
+        </h2>
+        <a href="{% url 'products:list' %}" class="btn btn-cyber-outline mt-3 mt-md-0">View All Catalog <i class="fa-solid fa-arrow-right ms-1"></i></a>
+    </div>
+    
+    <div class="row g-4">
+        {% for prod in trending_products %}
+            <div class="col-lg-4 col-md-6">
+                <div class="glass-panel p-3 h-100 border-neon-purple d-flex flex-column">
+                    <!-- Product Image -->
+                    <div class="position-relative mb-3 overflow-hidden rounded" style="height: 220px;">
+                        <img src="{{ prod.image_url }}" alt="{{ prod.name }}" class="w-100 h-100" style="object-fit: cover; transition: 0.5s;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
+                        {% if prod.stock == 0 %}
+                            <span class="position-absolute top-2 start-2 badge bg-danger text-uppercase brand-font">OUT OF STOCK</span>
+                        {% elif prod.stock <= 5 %}
+                            <span class="position-absolute top-2 start-2 badge bg-warning text-dark text-uppercase brand-font">LOW STOCK</span>
+                        {% endif %}
+                        <span class="position-absolute top-2 end-2 badge bg-dark border border-secondary text-info brand-font">${{ prod.price }}</span>
+                    </div>
+                    
+                    <!-- Specifications Summary inside hover card -->
+                    <div class="mb-3">
+                        <span class="small text-info brand-font">{{ prod.brand.name }}</span>
+                        <h4 class="h5 text-white mb-2 text-truncate">{{ prod.name }}</h4>
+                        <p class="small text-muted text-truncate">{{ prod.description }}</p>
+                        
+                        <!-- Mini spec tags -->
+                        <div class="mt-2">
+                            {% if prod.socket_type %}
+                                <span class="spec-badge spec-badge-blue">{{ prod.socket_type }}</span>
+                            {% endif %}
+                            {% if prod.ram_type %}
+                                <span class="spec-badge">{{ prod.ram_type }}</span>
+                            {% endif %}
+                            {% if prod.memory_size %}
+                                <span class="spec-badge spec-badge-blue">{{ prod.memory_size }}GB</span>
+                            {% endif %}
+                            {% if prod.storage_type %}
+                                <span class="spec-badge">{{ prod.storage_type }}</span>
+                            {% endif %}
+                            {% if prod.rgb_support %}
+                                <span class="spec-badge spec-badge-blue"><i class="fa-solid fa-rainbow me-1"></i>RGB</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="mt-auto pt-3 border-top border-secondary d-flex gap-2">
+                        <a href="{% url 'products:detail' prod.slug %}" class="btn btn-cyber-outline flex-grow-1 text-center py-2" style="font-size: 12px;">Specs</a>
+                        {% if prod.stock > 0 %}
+                            <form action="{% url 'cart:add' prod.id %}" method="POST" class="flex-grow-2 w-100">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-rgb w-100 py-2 d-flex align-items-center justify-content-center gap-1" style="font-size: 12px;">
+                                    <i class="fa-solid fa-cart-plus"></i>Add to Cart
+                                </button>
+                            </form>
+                        {% else %}
+                            <button class="btn btn-secondary w-100 py-2 disabled" style="font-size: 12px;"><i class="fa-solid fa-ban me-1"></i>Out of Stock</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="fa-solid fa-box-open fa-4x text-muted mb-3"></i>
+                <p class="text-muted">No telemetry items listed yet. Run python manage.py seed_data to seed.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- PC Builder Preview Section -->
+<section class="container my-5 py-5 border-top border-secondary">
+    <div class="glass-panel border-neon-blue p-5 text-center">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="d-inline-flex align-items-center justify-content-center bg-dark border border-info mb-4 rounded-circle live-glow" style="width: 90px; height: 90px;">
+                    <i class="fa-solid fa-screwdriver-wrench fa-3x text-info"></i>
+                </div>
+                <h2 class="display-5 brand-font text-white mb-3">Custom Rig Configurator</h2>
+                <p class="text-muted fs-5 mb-4">
+                    Tired of prebuilt limitations? Boot up our step-by-step custom PC builder. Choose your CPU, Motherboard, and RAM with real-time socket verification, automatic memory generation matching, and live power calculations.
+                </p>
+                <div class="row g-3 justify-content-center mb-5">
+                    <div class="col-lg-3 col-md-4 col-6">
+                        <div class="glass-panel p-3 border-neon-purple text-start">
+                            <h6 class="small text-info brand-font mb-0">Step 01</h6>
+                            <div class="fw-bold mt-1" style="font-size: 13px;">Lock CPU & Board</div>
+                            <span class="small text-muted" style="font-size: 10px;">Automatic socket check</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-6">
+                        <div class="glass-panel p-3 border-neon-purple text-start">
+                            <h6 class="small text-info brand-font mb-0">Step 02</h6>
+                            <div class="fw-bold mt-1" style="font-size: 13px;">RAM & GPU Setup</div>
+                            <span class="small text-muted" style="font-size: 10px;">Memory slots matching</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-6">
+                        <div class="glass-panel p-3 border-neon-purple text-start">
+                            <h6 class="small text-info brand-font mb-0">Step 03</h6>
+                            <div class="fw-bold mt-1" style="font-size: 13px;">Power Delivery</div>
+                            <span class="small text-muted" style="font-size: 10px;">Live wattage calculator</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a href="{% url 'builder:configurator' %}" class="btn btn-rgb px-5 py-3 fs-5">
+                        <i class="fa-solid fa-laptop-code me-2"></i>Launch Builder
+                    </a>
+                    <a href="{% url 'builder:ai_recommendation' %}" class="btn btn-cyber-outline px-5 py-3 fs-5">
+                        <i class="fa-solid fa-robot me-2"></i>AI Setup Suggestion
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Feedback Form Section -->
+<section class="container my-5 py-5 border-top border-secondary">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="glass-panel border-neon-purple p-5">
+                <div class="text-center mb-5">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-dark border border-secondary mb-4 rounded-circle" style="width: 80px; height: 80px;">
+                        <i class="fa-solid fa-comment-dots fa-3x text-info"></i>
+                    </div>
+                    <h2 class="display-6 brand-font text-white mb-2">SHARE YOUR FEEDBACK</h2>
+                    <p class="text-muted">Help us improve NOVA TECH. Your input shapes our future.</p>
+                </div>
+
+                <form method="POST" action="{% url 'support:submit_feedback' %}">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label brand-font text-white small" for="id_name">
+                                <i class="fa-solid fa-user me-2 text-info"></i>Your Name
+                            </label>
+                            <input type="text" name="name" id="id_name" class="form-control form-cyber text-white py-2" placeholder="Anonymous" value="{{ form.name.value|default:'' }}">
+                            <small class="text-muted d-block mt-1">Leave blank if you're logged in</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label brand-font text-white small" for="id_email">
+                                <i class="fa-solid fa-envelope me-2 text-info"></i>Email
+                            </label>
+                            <input type="email" name="email" id="id_email" class="form-control form-cyber text-white py-2" placeholder="your@email.com" value="{{ form.email.value|default:'' }}">
+                            <small class="text-muted d-block mt-1">For follow-up (optional)</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small mb-3">
+                            <i class="fa-solid fa-star me-2 text-warning"></i>Rate Your Experience
+                        </label>
+                        <div class="d-flex gap-3 flex-wrap">
+                            {% for value, label in form.rating.field.choices %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="rating" id="id_rating_{{ value }}" value="{{ value }}" {% if form.rating.value == value|stringformat:"s" %}checked{% endif %}>
+                                    <label class="form-check-label text-muted small" for="id_rating_{{ value }}">
+                                        {{ label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small" for="id_title">
+                            <i class="fa-solid fa-heading me-2 text-info"></i>Feedback Title
+                        </label>
+                        <input type="text" name="title" id="id_title" class="form-control form-cyber text-white py-2" placeholder="e.g., Excellent customer service" required value="{{ form.title.value|default:'' }}">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small" for="id_message">
+                            <i class="fa-solid fa-message me-2 text-info"></i>Your Feedback
+                        </label>
+                        <textarea name="message" id="id_message" class="form-control form-cyber text-white" placeholder="Tell us what you think about NOVA TECH..." rows="4" required>{{ form.message.value|default:'' }}</textarea>
+                        <small class="text-muted d-block mt-1">Help us understand your experience with our service</small>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-rgb flex-grow-1 py-3">
+                            <i class="fa-solid fa-paper-plane me-2"></i>Submit Feedback
+                        </button>
+                        <button type="reset" class="btn btn-cyber-outline py-3">
+                            <i class="fa-solid fa-rotate-left me-2"></i>Clear
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-4 pt-4 border-top border-secondary text-center">
+                    <p class="small text-muted mb-0">
+                        <i class="fa-solid fa-lock me-1 text-success"></i>Your privacy is protected. Feedback helps us serve you better.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

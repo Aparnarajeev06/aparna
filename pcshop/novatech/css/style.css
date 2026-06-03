@@ -1,0 +1,77 @@
+body{
+    background:#0d0d0d;
+    color:white;
+    font-family:'Poppins',sans-serif;
+}
+
+.navbar{
+    background:#111;
+}
+
+.navbar-brand{
+    font-family:'Orbitron',sans-serif;
+    font-size:28px;
+    color:#00e5ff !important;
+}
+
+.nav-link{
+    color:white !important;
+    margin-left:15px;
+}
+
+.hero{
+    height:90vh;
+    background:linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.7)),
+    url('https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=1470&auto=format&fit=crop');
+    background-size:cover;
+    background-position:center;
+    display:flex;
+    align-items:center;
+}
+
+.hero h1{
+    font-size:60px;
+    color:#00e5ff;
+    font-family:'Orbitron',sans-serif;
+}
+
+.btn-custom{
+    background:linear-gradient(45deg,#00e5ff,#7b2cff);
+    color:white;
+    border:none;
+    padding:12px 30px;
+    border-radius:30px;
+    margin:10px;
+}
+
+.section-title{
+    text-align:center;
+    margin:70px 0 40px;
+    color:#00e5ff;
+    font-family:'Orbitron',sans-serif;
+}
+
+.category-card,
+.product-card{
+    background:#1a1a1a;
+    padding:20px;
+    border-radius:15px;
+    transition:0.3s;
+}
+
+.category-card:hover,
+.product-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 0 20px rgba(0,229,255,0.3);
+}
+
+.product-card img{
+    width:100%;
+    border-radius:10px;
+}
+
+footer{
+    background:#111;
+    padding:40px;
+    margin-top:60px;
+}

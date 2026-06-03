@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | Admin Telemetry Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- Header Page Banner -->
+<section class="py-4 bg-dark border-bottom border-secondary mb-4" style="background: linear-gradient(180deg, #050508 0%, var(--bg-dark) 100%);">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-info text-decoration-none small">Home</a></li>
+                    <li class="breadcrumb-item active text-white small" aria-current="page">Admin Dashboard</li>
+                </ol>
+            </nav>
+            <h1 class="brand-font text-white mb-0 text-uppercase"><i class="fa-solid fa-screwdriver-wrench me-2 text-warning"></i>Nexus Command Center</h1>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/admin/" target="_blank" class="btn btn-rgb py-2 px-4"><i class="fa-solid fa-gears me-2"></i>Django Standard Admin</a>
+            <a href="/admin/products/product/add/" target="_blank" class="btn btn-cyber-outline py-2 px-4"><i class="fa-solid fa-plus me-2"></i>Add Hardware</a>
+        </div>
+    </div>
+</section>
+
+<!-- Command Dashboard Controls -->
+<div class="container my-5">
+    
+    <!-- Stat grid -->
+    <div class="row g-4 mb-5">
+        
+        <!-- Total Revenue Card -->
+        <div class="col-lg-3 col-sm-6">
+            <div class="glass-panel p-4 border-neon-blue live-glow text-center">
+                <i class="fa-solid fa-money-bill-trend-up fa-3x text-info mb-3"></i>
+                <h6 class="text-muted brand-font text-uppercase small">Gross Earnings</h6>
+                <div class="display-6 brand-font text-white fw-bold mt-2" style="text-shadow: 0 0 10px rgba(0,229,255,0.3);">${{ total_revenue }}</div>
+            </div>
+        </div>
+
+        <!-- Total Orders Card -->
+        <div class="col-lg-3 col-sm-6">
+            <div class="glass-panel p-4 border-neon-purple text-center">
+                <i class="fa-solid fa-dolly fa-3x text-purple mb-3"></i>
+                <h6 class="text-muted brand-font text-uppercase small">Orders Dispatched</h6>
+                <div class="display-6 brand-font text-white fw-bold mt-2">{{ total_orders }}</div>
+            </div>
+        </div>
+
+        <!-- Active Inventory & Low stock warnings -->
+        <div class="col-lg-3 col-sm-6">
+            <div class="glass-panel p-4 {% if low_stock_products.count > 0 %}border-neon-pink{% else %}border-neon-purple{% endif %} text-center">
+                <i class="fa-solid fa-warehouse fa-3x {% if low_stock_products.count > 0 %}text-danger pulsate{% else %}text-info{% endif %} mb-3"></i>
+                <h6 class="text-muted brand-font text-uppercase small">Stock Alerts</h6>
+                <div class="display-6 brand-font text-white fw-bold mt-2">
+                    {{ low_stock_products.count }} <span class="fs-6 text-danger">Crit</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Users count -->
+        <div class="col-lg-3 col-sm-6">
+            <div class="glass-panel p-4 border-neon-blue text-center">
+                <i class="fa-solid fa-users-gear fa-3x text-info mb-3"></i>
+                <h6 class="text-muted brand-font text-uppercase small">Shopper Registry</h6>
+                <div class="display-6 brand-font text-white fw-bold mt-2">{{ total_users }}</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row g-4">
+        
+        <!-- Recent Orders table -->
+        <div class="col-lg-12">
+            <div class="glass-panel p-4 border-neon-purple mb-5">
+                <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-clock-rotate-left me-2"></i>Recent Transactions Log</h3>
+                <div class="table-responsive">
+                    <table class="table table-cyber text-white mb-0" style="font-size: 13px;">
+                        <thead>
+                            <tr>
+                                <th>Tracking Number</th>
+                                <th>Client User</th>
+                                <th>Price Sum</th>
+                                <th>Payment</th>
+                                <th>Shipping Status</th>
+                                <th>Registered Date</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ord in recent_orders %}
+                                <tr>
+                                    <td class="brand-font text-info">{{ ord.tracking_number }}</td>
+                                    <td>{{ ord.user.username }}</td>
+                                    <td class="fw-bold">${{ ord.total_price }}</td>
+                                    <td>
+                                        <span class="badge bg-dark border {% if ord.payment_status == 'Paid' %}border-success text-success{% else %}border-danger text-danger{% endif %} py-2 px-3">
+                                            {{ ord.payment_status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-dark border {% if ord.shipping_status == 'Delivered' %}border-success text-success{% elif ord.shipping_status == 'Cancelled' %}border-danger text-danger{% else %}border-warning text-warning{% endif %} py-2 px-3">
+                                            {{ ord.shipping_status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ ord.created_at|date:"M d, Y H:i" }}</td>
+                                    <td class="text-end">
+                                        <a href="/admin/orders/order/{{ ord.id }}/change/" target="_blank" class="btn btn-cyber-outline btn-sm py-1 px-3" style="font-size: 11px;"><i class="fa-solid fa-file-pen me-1"></i>Edit</a>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">No transactions registered in system database.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Low stock warnings list -->
+        {% if low_stock_products %}
+        <div class="col-lg-12">
+            <div class="glass-panel p-4 border-neon-blue mb-5 border-neon-pink live-glow">
+                <h3 class="brand-font text-danger mb-4 border-bottom border-danger pb-2"><i class="fa-solid fa-circle-exclamation me-2 pulsate"></i>Critical Low Stock Warnings</h3>
+                <div class="row g-3">
+                    {% for lp in low_stock_products %}
+                        <div class="col-md-4">
+                            <div class="glass-panel p-3 border-secondary bg-dark d-flex align-items-center justify-content-between">
+                                <div class="overflow-hidden">
+                                    <div class="fw-bold text-white text-truncate">{{ lp.name }}</div>
+                                    <div class="small text-danger brand-font mt-1">Remaining Stock: {{ lp.stock }}</div>
+                                </div>
+                                <a href="/admin/products/product/{{ lp.id }}/change/" target="_blank" class="btn btn-cyber-outline py-1 px-2 btn-sm border-neon-pink text-danger" style="font-size: 10px;">Refill</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Product inventory list -->
+        <div class="col-lg-12">
+            <div class="glass-panel p-4 border-neon-blue mb-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 border-bottom border-secondary pb-2">
+                    <h3 class="brand-font text-info mb-0"><i class="fa-solid fa-cubes me-2"></i>Hardware Stock Catalog</h3>
+                    <span class="badge bg-dark border border-info text-info p-2 brand-font">Total Items: {{ all_products.count }}</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-cyber text-white mb-0" style="font-size: 13px;">
+                        <thead>
+                            <tr>
+                                <th>Thumbnail</th>
+                                <th>Hardware Name</th>
+                                <th>Category</th>
+                                <th>Brand</th>
+                                <th>Unit Price</th>
+                                <th>In-Stock Level</th>
+                                <th class="text-end">Telemetry Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in all_products %}
+                                <tr>
+                                    <td>
+                                        <img src="{{ p.image_url }}" alt="thumb" class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                                    </td>
+                                    <td class="fw-bold text-white">{{ p.name }}</td>
+                                    <td>{{ p.category.name }}</td>
+                                    <td class="text-info brand-font">{{ p.brand.name }}</td>
+                                    <td class="brand-font text-info">${{ p.price }}</td>
+                                    <td>
+                                        {% if p.stock == 0 %}
+                                            <span class="text-danger fw-bold"><i class="fa-solid fa-triangle-exclamation me-1"></i>Out of Stock</span>
+                                        {% elif p.stock <= 5 %}
+                                            <span class="text-warning fw-bold"><i class="fa-solid fa-circle-exclamation me-1"></i>Low ({{ p.stock }})</span>
+                                        {% else %}
+                                            <span class="text-success"><i class="fa-solid fa-circle-check me-1"></i>Healthy ({{ p.stock }})</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="d-flex gap-2 justify-content-end">
+                                            <a href="/admin/products/product/{{ p.id }}/change/" target="_blank" class="btn btn-cyber-outline btn-sm py-1 px-2" style="font-size: 11px;"><i class="fa-solid fa-pen-nib me-1"></i>Edit</a>
+                                            <a href="{% url 'products:detail' p.slug %}" class="btn btn-cyber-outline btn-sm py-1 px-2" style="font-size: 11px;"><i class="fa-solid fa-eye me-1"></i>View</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

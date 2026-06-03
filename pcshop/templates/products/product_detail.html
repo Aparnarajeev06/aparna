@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | {{ product.name }} Specs{% endblock %}
+
+{% block content %}
+
+<!-- Header Breadcrumb -->
+<section class="py-4 bg-dark border-bottom border-secondary mb-4" style="background: linear-gradient(180deg, #050508 0%, var(--bg-dark) 100%);">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-info text-decoration-none small">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'products:list' %}" class="text-info text-decoration-none small">Products</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'products:list' %}?category={{ product.category.slug }}" class="text-info text-decoration-none small">{{ product.category.name }}</a></li>
+                <li class="breadcrumb-item active text-white small" aria-current="page">{{ product.name }}</li>
+            </ol>
+        </nav>
+        <h1 class="brand-font text-white mb-0 text-uppercase h2" style="letter-spacing: 0.5px;">{{ product.name }}</h1>
+    </div>
+</section>
+
+<!-- Detail Panel -->
+<div class="container my-5">
+    <div class="row g-5">
+        
+        <!-- Part Image and Gallery Panel -->
+        <div class="col-lg-6">
+            <div class="glass-panel p-4 text-center border-neon-blue live-glow">
+                <div class="rounded overflow-hidden mb-3" style="max-height: 400px; height: 350px;">
+                    <img src="{{ product.image_url }}" alt="{{ product.name }}" class="w-100 h-100 img-fluid" style="object-fit: cover;">
+                </div>
+                <div class="row g-2 justify-content-center">
+                    <div class="col-3">
+                        <div class="border border-info rounded p-1" style="height: 60px; overflow: hidden; opacity: 0.85;">
+                            <img src="{{ product.image_url }}" alt="thumb" class="w-100 h-100" style="object-fit: cover;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Specifications Summary & Purchases Options -->
+        <div class="col-lg-6">
+            <div class="glass-panel p-4 border-neon-purple h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <!-- Brand and category -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-info brand-font fs-5">{{ product.brand.name }}</span>
+                        <span class="badge bg-dark border border-secondary text-white px-3 py-2 brand-font" style="font-size: 11px;">{{ product.category.name }}</span>
+                    </div>
+
+                    <!-- Title -->
+                    <h2 class="text-white brand-font mb-3 h3">{{ product.name }}</h2>
+
+                    <!-- Stock Status telemetry indicator -->
+                    <div class="mb-4">
+                        {% if product.stock == 0 %}
+                            <span class="badge bg-danger px-3 py-2 text-uppercase brand-font"><i class="fa-solid fa-circle-xmark me-2"></i>Out of Stock</span>
+                        {% elif product.stock <= 5 %}
+                            <span class="badge bg-warning text-dark px-3 py-2 text-uppercase brand-font"><i class="fa-solid fa-circle-exclamation me-2"></i>Critical stock: only {{ product.stock }} units remain</span>
+                        {% else %}
+                            <span class="badge bg-success px-3 py-2 text-uppercase brand-font border border-success" style="box-shadow: 0 0 10px rgba(40,167,69,0.3);"><i class="fa-solid fa-circle-check me-2"></i>Status: In Stock ({{ product.stock }})</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Price -->
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <span class="text-muted small">Standard Pricing:</span>
+                        <span class="text-info display-5 brand-font fw-bold" style="text-shadow: 0 0 10px rgba(0,229,255,0.35);">${{ product.price }}</span>
+                    </div>
+
+                    <!-- Short Description -->
+                    <p class="text-muted mb-4 fs-6 leading-relaxed">
+                        {{ product.description }}
+                    </p>
+                </div>
+
+                <!-- Purchase Buttons form -->
+                <div class="border-top border-secondary pt-4">
+                    {% if product.stock > 0 %}
+                        <form action="{% url 'cart:add' product.id %}" method="POST" class="row g-3 align-items-center">
+                            {% csrf_token %}
+                            <div class="col-md-3">
+                                <label class="form-label brand-font text-white small" for="quantity">Quantity</label>
+                                <input type="number" name="quantity" id="quantity" class="form-control form-cyber text-white text-center py-2" value="1" min="1" max="{{ product.stock }}" style="font-family: 'Orbitron', sans-serif;">
+                            </div>
+                            <div class="col-md-9 d-flex gap-2 align-items-end">
+                                <button type="submit" class="btn btn-rgb w-100 py-3 d-flex align-items-center justify-content-center gap-2">
+                                    <i class="fa-solid fa-cart-arrow-down fs-5"></i>Add to Shopping Cart
+                                </button>
+                                
+                                {% if user.is_authenticated %}
+                                    <a href="{% url 'products:toggle_wishlist' product.id %}" class="btn btn-cyber-outline py-3 px-3 d-flex align-items-center justify-content-center" title="Toggle Bookmark" style="width: 55px; height: 52px; border-radius: 50%;">
+                                        <i class="fa-heart {% if in_wishlist %}fa-solid text-danger{% else %}fa-regular{% endif %} fs-4"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-secondary w-100 py-3 disabled"><i class="fa-solid fa-ban me-2"></i>Temporarily Out of Stock</button>
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'products:toggle_wishlist' product.id %}" class="btn btn-cyber-outline py-3 px-3 d-flex align-items-center justify-content-center" style="width: 55px; height: 52px; border-radius: 50%;">
+                                    <i class="fa-heart {% if in_wishlist %}fa-solid text-danger{% else %}fa-regular{% endif %} fs-4"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    {% if product.category.slug in 'cpus,motherboards,ram,gpus,storage,power-supplies' %}
+                        <div class="mt-3 text-center text-lg-start">
+                            <a href="{% url 'builder:add_part' product.id %}" class="small text-info text-decoration-none fw-bold brand-font"><i class="fa-solid fa-screwdriver-wrench me-1"></i>Lock this part into your Custom PC Builder active configuration</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Specifications Table Tab -->
+    <div class="row mt-5 pt-3">
+        <div class="col-lg-7">
+            <div class="glass-panel p-4 border-neon-blue h-100">
+                <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-sliders me-2"></i>Technical Telemetry</h3>
+                <div class="table-responsive">
+                    <table class="table table-cyber text-white mb-0" style="font-size: 14px;">
+                        <tbody>
+                            <tr>
+                                <td class="brand-font text-info" style="width: 40%;">Brand</td>
+                                <td>{{ product.brand.name }}</td>
+                            </tr>
+                            <tr>
+                                <td class="brand-font text-info">Category</td>
+                                <td>{{ product.category.name }}</td>
+                            </tr>
+                            {% if product.socket_type %}
+                            <tr>
+                                <td class="brand-font text-info">Socket Type</td>
+                                <td><span class="badge bg-dark border border-info text-info">{{ product.socket_type }}</span></td>
+                            </tr>
+                            {% endif %}
+                            {% if product.ram_type %}
+                            <tr>
+                                <td class="brand-font text-info">RAM Standard</td>
+                                <td><span class="badge bg-dark border border-purple text-purple">{{ product.ram_type }}</span></td>
+                            </tr>
+                            {% endif %}
+                            {% if product.memory_size %}
+                            <tr>
+                                <td class="brand-font text-info">Memory Capacity</td>
+                                <td>{{ product.memory_size }} GB</td>
+                            </tr>
+                            {% endif %}
+                            {% if product.storage_type %}
+                            <tr>
+                                <td class="brand-font text-info">Storage Format</td>
+                                <td>{{ product.storage_type }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <td class="brand-font text-info">RGB Illumination</td>
+                                <td>
+                                    {% if product.rgb_support %}
+                                        <span class="text-success"><i class="fa-solid fa-rainbow me-1"></i>Supported</span>
+                                    {% else %}
+                                        <span class="text-muted">None</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% if product.wattage > 0 %}
+                            <tr>
+                                <td class="brand-font text-info">Power Delivery/Consumption</td>
+                                <td>{{ product.wattage }} Watts</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews & Feedback System -->
+        <div class="col-lg-5">
+            <div class="glass-panel p-4 border-neon-purple h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-star me-2"></i>Reviews ({{ reviews.count }})</h3>
+                    
+                    <div class="overflow-y-auto mb-4" style="max-height: 250px;">
+                        {% for r in reviews %}
+                            <div class="glass-panel p-3 mb-2 border-secondary" style="background: rgba(10,10,12,0.6);">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-bold text-info" style="font-size: 13px;">{{ r.user.username }}</span>
+                                    <span class="small text-muted" style="font-size: 10px;">{{ r.created_at|date:"M d, Y" }}</span>
+                                </div>
+                                <div class="text-warning mb-2" style="font-size: 11px;">
+                                    {% for idx in "12345" %}
+                                        <i class="{% if forloop.counter <= r.rating %}fa-solid{% else %}fa-regular{% endif %} fa-star"></i>
+                                    {% endfor %}
+                                </div>
+                                <p class="small mb-0 text-white">{{ r.comment }}</p>
+                            </div>
+                        {% empty %}
+                            <div class="text-center py-4 text-muted">
+                                <i class="fa-regular fa-star fa-3x mb-3 text-muted"></i>
+                                <p class="small mb-0">No reviews submitted yet. Be the first to share specifications feedback!</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Submit Review Panel -->
+                <div class="border-top border-secondary pt-3">
+                    {% if user.is_authenticated %}
+                        <form action="{% url 'products:add_review' product.id %}" method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label brand-font text-white small">Your Rating</label>
+                                <select name="rating" class="form-select form-cyber text-white py-2" required style="font-family: 'Orbitron', sans-serif;">
+                                    <option value="5">⭐⭐⭐⭐⭐ (5 - Extreme Performance)</option>
+                                    <option value="4">⭐⭐⭐⭐ (4 - Highly Recommended)</option>
+                                    <option value="3">⭐⭐⭐ (3 - Standard Efficiency)</option>
+                                    <option value="2">⭐⭐ (2 - Sub-optimal Specs)</option>
+                                    <option value="1">⭐ (1 - Hardware Malfunction)</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label brand-font text-white small">Feedback Comment</label>
+                                <textarea name="comment" class="form-control form-cyber text-white" rows="2" placeholder="Write your testing results here..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-rgb w-100 py-2">Submit Diagnostic</button>
+                        </form>
+                    {% else %}
+                        <div class="text-center p-3 glass-panel border-secondary" style="background: rgba(10,10,12,0.4);">
+                            <p class="small text-muted mb-2">You must be logged into your account to submit telemetry reviews.</p>
+                            <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-cyber-outline btn-sm w-100">Login Portal</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <section class="mt-5 pt-4 border-top border-secondary">
+        <h3 class="brand-font text-info text-uppercase mb-4"><i class="fa-solid fa-circle-nodes me-2"></i>Related Components</h3>
+        <div class="row g-4">
+            {% for rp in related_products %}
+                <div class="col-lg-3 col-md-6">
+                    <div class="glass-panel p-3 h-100 border-neon-purple d-flex flex-column justify-content-between">
+                        <div class="position-relative overflow-hidden rounded mb-3" style="height: 140px;">
+                            <img src="{{ rp.image_url }}" alt="{{ rp.name }}" class="w-100 h-100" style="object-fit: cover;">
+                            <span class="position-absolute bottom-2 start-2 badge bg-dark border border-secondary text-info brand-font">${{ rp.price }}</span>
+                        </div>
+                        <h6 class="text-white text-truncate mb-2">{{ rp.name }}</h6>
+                        <a href="{% url 'products:detail' rp.slug %}" class="btn btn-cyber-outline btn-sm w-100 text-center py-2">Specs Details</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+</div>
+
+{% endblock %}

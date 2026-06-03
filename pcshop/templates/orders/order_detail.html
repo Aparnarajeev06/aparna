@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | Order #{{ order.tracking_number }} Receipt{% endblock %}
+
+{% block content %}
+
+<!-- Header Page Banner -->
+<section class="py-4 bg-dark border-bottom border-secondary mb-5" style="background: linear-gradient(180deg, #050508 0%, var(--bg-dark) 100%);">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-info text-decoration-none small">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:dashboard' %}" class="text-info text-decoration-none small">Dashboard</a></li>
+                    <li class="breadcrumb-item active text-white small" aria-current="page">Receipt Specs</li>
+                </ol>
+            </nav>
+            <h1 class="brand-font text-white mb-0 text-uppercase h2">Order Telemetry Specs</h1>
+        </div>
+        <a href="{% url 'accounts:dashboard' %}" class="btn btn-cyber-outline py-2 px-4"><i class="fa-solid fa-angle-left me-2"></i>My Dashboard</a>
+    </div>
+</section>
+
+<!-- Invoice Grid -->
+<div class="container my-5">
+    <div class="row g-5">
+        
+        <!-- Left Side: Order item lists -->
+        <div class="col-lg-8">
+            <div class="glass-panel p-4 border-neon-purple mb-4">
+                <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-receipt me-2"></i>Invoice Details</h3>
+                <div class="table-responsive">
+                    <table class="table table-cyber text-white mb-0" style="font-size: 14px; vertical-align: middle;">
+                        <thead>
+                            <tr>
+                                <th>Hardware Part</th>
+                                <th>Unit Cost</th>
+                                <th class="text-center">Count</th>
+                                <th>Tally</th>
+                                <th class="text-end">RMA Warranty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.items.all %}
+                                <tr>
+                                    <td>
+                                        {% if item.product %}
+                                            <a href="{% url 'products:detail' item.product.slug %}" class="text-white text-decoration-none fw-bold text-hover-info">{{ item.product.name }}</a>
+                                            <div class="small text-muted">{{ item.product.brand.name }}</div>
+                                        {% else %}
+                                            <span class="text-muted fw-bold">Discontinued Part</span>
+                                            <div class="small text-muted">Item deleted from inventory catalog</div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="brand-font text-info">${{ item.price }}</td>
+                                    <td class="text-center">{{ item.quantity }}</td>
+                                    <td class="brand-font text-info fw-bold">${{ item.total_price }}</td>
+                                    <td class="text-end">
+                                        {% if item.product %}
+                                            <a href="{% url 'support:create_rma' item.id %}" class="btn btn-cyber-outline btn-sm py-1 px-3" style="font-size: 10px;"><i class="fa-solid fa-arrow-rotate-left me-1"></i>Claim RMA</a>
+                                        {% else %}
+                                            <button class="btn btn-secondary btn-sm disabled py-1 px-3" style="font-size: 10px;">Unavailable</button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Order Diagnostics -->
+        <div class="col-lg-4">
+            <div class="glass-panel p-4 border-neon-blue h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-gears me-2"></i>Diagnostics</h3>
+                    
+                    <div class="p-3 bg-dark rounded border border-secondary mb-4" style="background: rgba(10,10,12,0.65);">
+                        <div class="mb-3">
+                            <span class="text-muted small d-block">Order ID Code:</span>
+                            <strong class="text-info brand-font fs-5" style="letter-spacing: 0.5px;">{{ order.tracking_number }}</strong>
+                        </div>
+                        <div class="mb-3">
+                            <span class="text-muted small d-block">Dispatch Status:</span>
+                            <span class="badge bg-dark border {% if order.shipping_status == 'Delivered' %}border-success text-success{% elif order.shipping_status == 'Cancelled' %}border-danger text-danger{% else %}border-warning text-warning{% endif %} py-2 px-3 mt-1 fw-bold brand-font" style="font-size: 11px;">
+                                {{ order.shipping_status|upper }}
+                            </span>
+                        </div>
+                        <div class="mb-3">
+                            <span class="text-muted small d-block">Payment Status:</span>
+                            <span class="badge bg-dark border {% if order.payment_status == 'Paid' %}border-success text-success{% else %}border-danger text-danger{% endif %} py-2 px-3 mt-1 fw-bold brand-font" style="font-size: 11px;">
+                                {{ order.payment_status|upper }}
+                            </span>
+                        </div>
+                        <div class="mb-3">
+                            <span class="text-muted small d-block">Destination coordinates:</span>
+                            <p class="small text-white mb-0 mt-1" style="font-size: 12px; line-height: 1.5;">{{ order.shipping_address }}</p>
+                        </div>
+                        <div class="mb-0">
+                            <span class="text-muted small d-block">Registered Date:</span>
+                            <span class="small text-white mt-1 d-block">{{ order.created_at|date:"M d, Y H:i" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aggregated tallies -->
+                <div class="border-top border-secondary pt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="brand-font text-white">Price Aggregate:</span>
+                        <strong class="brand-font text-info fs-3 fw-bold" style="text-shadow: 0 0 10px rgba(0,229,255,0.3);">${{ order.total_price }}</strong>
+                    </div>
+                    <button onclick="window.print();" class="btn btn-rgb w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                        <i class="fa-solid fa-print"></i>Print Hardcopy Receipt
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

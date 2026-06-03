@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | AI rig recommendations{% endblock %}
+
+{% block content %}
+
+<!-- Header Page Banner -->
+<section class="py-4 bg-dark border-bottom border-secondary mb-5" style="background: linear-gradient(180deg, #050508 0%, var(--bg-dark) 100%);">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-info text-decoration-none small">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'builder:configurator' %}" class="text-info text-decoration-none small">PC Builder</a></li>
+                    <li class="breadcrumb-item active text-white small" aria-current="page">AI recommendations</li>
+                </ol>
+            </nav>
+            <h1 class="brand-font text-white mb-0 text-uppercase h2"><i class="fa-solid fa-robot me-2 text-info"></i>AI recommendations</h1>
+        </div>
+        <a href="{% url 'builder:configurator' %}" class="btn btn-cyber-outline py-2 px-4"><i class="fa-solid fa-angle-left me-2"></i>Back to builder</a>
+    </div>
+</section>
+
+<!-- AI Selection Grid -->
+<div class="container my-5">
+    <div class="row g-5">
+        
+        <!-- Left Side: Interactive Preferences Form -->
+        <div class="col-lg-4">
+            <div class="glass-panel p-4 border-neon-purple h-100">
+                <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-brain me-2"></i>Preferences Form</h3>
+                
+                <form action="{% url 'builder:ai_recommendation' %}" method="GET">
+                    
+                    <!-- Budget Tier -->
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small">Target Budget Tier</label>
+                        <select name="budget" class="form-select form-cyber text-white">
+                            <option value="low" {% if budget == 'low' %}selected{% endif %}>Budget Entry (< $800)</option>
+                            <option value="mid" {% if budget == 'mid' %}selected{% endif %}>Mid-range Nexus ($800 - $1600)</option>
+                            <option value="high" {% if budget == 'high' %}selected{% endif %}>Extreme Performance (> $1600)</option>
+                        </select>
+                    </div>
+
+                    <!-- Primary Usecase -->
+                    <div class="mb-4">
+                        <label class="form-label brand-font text-white small">Primary Usecase Profile</label>
+                        <select name="usecase" class="form-select form-cyber text-white">
+                            <option value="gaming" {% if usecase == 'gaming' %}selected{% endif %}>Extreme Ray-Traced Gaming</option>
+                            <option value="streaming" {% if usecase == 'streaming' %}selected{% endif %}>High-Bandwidth Broadcasting/Streaming</option>
+                            <option value="programming" {% if usecase == 'programming' %}selected{% endif %}>Heavy Programming & Machine Learning</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-rgb w-100 py-3 mt-3">
+                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Compile AI Telemetry
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Side: Recommendations Compilation Outcome -->
+        <div class="col-lg-8">
+            <div class="glass-panel p-4 border-neon-blue h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary pb-2">
+                        <h3 class="brand-font text-info mb-0"><i class="fa-solid fa-server me-2"></i>Compiled Recommendation Specs</h3>
+                        <span class="badge bg-info text-dark brand-font text-uppercase">{{ budget|upper }} SYSTEM</span>
+                    </div>
+
+                    <!-- Recommended part elements rows -->
+                    <div class="table-responsive">
+                        <table class="table table-cyber text-white mb-0" style="vertical-align: middle; font-size: 13px;">
+                            <thead>
+                                <tr>
+                                    <th>Step Component</th>
+                                    <th>Telemetry Product Recommendation</th>
+                                    <th>Wattage</th>
+                                    <th class="text-end">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <!-- CPU -->
+                                <tr>
+                                    <td class="brand-font text-info">CPU</td>
+                                    <td>{% if cpu %}<strong>{{ cpu.name }}</strong><span class="spec-badge spec-badge-blue ms-2">{{ cpu.socket_type }}</span>{% else %}<span class="text-danger">Part missing</span>{% endif %}</td>
+                                    <td>{% if cpu %}{{ cpu.wattage }}W{% else %}-{% endif %}</td>
+                                    <td class="text-end text-info fw-bold">{% if cpu %}${{ cpu.price }}{% else %}-{% endif %}</td>
+                                </tr>
+
+                                <!-- Board -->
+                                <tr>
+                                    <td class="brand-font text-info">Motherboard</td>
+                                    <td>{% if motherboard %}<strong>{{ motherboard.name }}</strong><span class="spec-badge ms-2">{{ motherboard.ram_type }}</span>{% else %}<span class="text-danger">Part missing</span>{% endif %}</td>
+                                    <td>{% if motherboard %}{{ motherboard.wattage }}W{% else %}-{% endif %}</td>
+                                    <td class="text-end text-info fw-bold">{% if motherboard %}${{ motherboard.price }}{% else %}-{% endif %}</td>
+                                </tr>
+
+                                <!-- RAM -->
+                                <tr>
+                                    <td class="brand-font text-info">RAM Memory</td>
+                                    <td>{% if ram %}<strong>{{ ram.name }}</strong><span class="spec-badge spec-badge-blue ms-2">{{ ram.memory_size }}GB</span>{% else %}<span class="text-danger">Part missing</span>{% endif %}</td>
+                                    <td>{% if ram %}{{ ram.wattage }}W{% else %}-{% endif %}</td>
+                                    <td class="text-end text-info fw-bold">{% if ram %}${{ ram.price }}{% else %}-{% endif %}</td>
+                                </tr>
+
+                                <!-- GPU -->
+                                <tr>
+                                    <td class="brand-font text-info">GPU Graphics</td>
+                                    <td>{% if gpu %}<strong>{{ gpu.name }}</strong><span class="spec-badge ms-2">{{ gpu.memory_size }}GB</span>{% else %}<span class="text-danger">Part missing</span>{% endif %}</td>
+                                    <td>{% if gpu %}{{ gpu.wattage }}W{% else %}-{% endif %}</td>
+                                    <td class="text-end text-info fw-bold">{% if gpu %}${{ gpu.price }}{% else %}-{% endif %}</td>
+                                </tr>
+
+                                <!-- Storage -->
+                                <tr>
+                                    <td class="brand-font text-info">Storage</td>
+                                    <td>{% if storage %}<strong>{{ storage.name }}</strong><span class="spec-badge spec-badge-blue ms-2">{{ storage.storage_type }}</span>{% else %}<span class="text-danger">Part missing</span>{% endif %}</td>
+                                    <td>{% if storage %}{{ storage.wattage }}W{% else %}-{% endif %}</td>
+                                    <td class="text-end text-info fw-bold">{% if storage %}${{ storage.price }}{% else %}-{% endif %}</td>
+                                </tr>
+
+                                <!-- PSU -->
+                                <tr>
+                                    <td class="brand-font text-info">Power Supply</td>
+                                    <td>{% if psu %}<strong>{{ psu.name }}</strong><span class="spec-badge ms-2">{{ psu.wattage }}W</span>{% else %}<span class="text-danger">Part missing</span>{% endif %}</td>
+                                    <td>-</td>
+                                    <td class="text-end text-info fw-bold">{% if psu %}${{ psu.price }}{% else %}-{% endif %}</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Specifications aggregates -->
+                    <div class="row g-3 mt-4">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-dark rounded border border-secondary text-start" style="background: rgba(10,10,12,0.4);">
+                                <div class="small text-muted">Estimated System draw:</div>
+                                <strong class="text-white fs-5">{{ total_wattage }} Watts</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-dark rounded border border-secondary text-start" style="background: rgba(10,10,12,0.4);">
+                                <div class="small text-muted">Compatibility Diagnostic:</div>
+                                <strong class="text-success fs-5"><i class="fa-solid fa-shield-check me-2"></i>SECURE TELEMETRY</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loader triggers -->
+                <div class="border-top border-secondary pt-4 mt-4 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-muted small">Estimated Price:</span>
+                        <strong class="brand-font text-info fs-3 fw-bold" style="text-shadow: 0 0 10px rgba(0,229,255,0.3);">${{ total_price }}</strong>
+                    </div>
+                    {% if total_price > 0 %}
+                        <a href="{% url 'builder:ai_recommendation' %}?budget={{ budget }}&usecase={{ usecase }}&load=true" class="btn btn-rgb py-3 px-4 d-flex align-items-center justify-content-center gap-2">
+                            <i class="fa-solid fa-download"></i>Load AI Build into PC Builder
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

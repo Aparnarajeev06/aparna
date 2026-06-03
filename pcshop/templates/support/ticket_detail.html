@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NOVA TECH | Ticket #{{ ticket.id }} Chat Thread{% endblock %}
+
+{% block content %}
+
+<!-- Header Page Banner -->
+<section class="py-4 bg-dark border-bottom border-secondary mb-5" style="background: linear-gradient(180deg, #050508 0%, var(--bg-dark) 100%);">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-info text-decoration-none small">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:dashboard' %}" class="text-info text-decoration-none small">Dashboard</a></li>
+                    <li class="breadcrumb-item active text-white small" aria-current="page">Support ticket dialogue</li>
+                </ol>
+            </nav>
+            <h1 class="brand-font text-white mb-0 text-uppercase h2">Ticket telemetry #{{ ticket.id }}</h1>
+        </div>
+        <a href="{% url 'accounts:dashboard' %}" class="btn btn-cyber-outline py-2 px-4"><i class="fa-solid fa-angle-left me-2"></i>My Dashboard</a>
+    </div>
+</section>
+
+<!-- Chat Dialogue Grid -->
+<div class="container my-5">
+    <div class="row g-5">
+        
+        <!-- Left Side: Ticket Telemetry Status -->
+        <div class="col-lg-4">
+            <div class="glass-panel p-4 border-neon-purple h-100">
+                <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-sliders me-2"></i>Telemetry</h3>
+                
+                <div class="p-3 bg-dark rounded border border-secondary mb-4" style="background: rgba(10,10,12,0.65);">
+                    <div class="mb-3">
+                        <span class="text-muted small d-block">Subject:</span>
+                        <strong class="text-white fs-6">{{ ticket.subject }}</strong>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-muted small d-block">Category:</span>
+                        <span class="badge bg-dark border border-purple text-purple py-1 px-2 mt-1">{{ ticket.category }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-muted small d-block">Ticket Status:</span>
+                        <span class="badge bg-dark border {% if ticket.status == 'Open' %}border-info text-info{% elif ticket.status == 'In Progress' %}border-warning text-warning{% else %}border-secondary text-muted{% endif %} py-2 px-3 mt-1 fw-bold brand-font" style="font-size: 11px;">
+                            {{ ticket.status|upper }}
+                        </span>
+                    </div>
+                    <div class="mb-0">
+                        <span class="text-muted small d-block">Logged date:</span>
+                        <span class="small text-white mt-1 d-block">{{ ticket.created_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Chat dialogues thread log -->
+        <div class="col-lg-8">
+            <div class="glass-panel p-4 border-neon-blue d-flex flex-column h-100">
+                <h3 class="brand-font text-info mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-comments me-2"></i>Communications Thread</h3>
+                
+                <!-- Chat log -->
+                <div class="overflow-y-auto mb-4 p-3 rounded bg-dark border border-secondary flex-grow-1" style="max-height: 380px; min-height: 250px; background: rgba(5,5,8,0.7) !important;">
+                    
+                    <!-- Original Description as first bubble -->
+                    <div class="d-flex mb-3 align-items-start gap-3">
+                        <div class="bg-dark border border-purple rounded-circle d-flex align-items-center justify-content-center text-purple" style="width: 35px; height: 35px; min-width: 35px;">
+                            <i class="fa-solid fa-user-astronaut"></i>
+                        </div>
+                        <div class="p-3 rounded text-white" style="background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3); max-width: 80%;">
+                            <div class="small fw-bold text-info mb-1">{{ ticket.user.username }} (Originator)</div>
+                            <p class="small mb-0 leading-relaxed">{{ ticket.description }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Replied chats -->
+                    {% for reply in replies %}
+                        <div class="d-flex mb-3 align-items-start gap-3 {% if reply.sender == request.user %}flex-row-reverse{% endif %}">
+                            <div class="bg-dark border {% if reply.sender.is_staff %}border-info text-info{% else %}border-purple text-purple{% endif %} rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; min-width: 35px;">
+                                <i class="fa-solid {% if reply.sender.is_staff %}fa-user-tie{% else %}fa-user-astronaut{% endif %}"></i>
+                            </div>
+                            <div class="p-3 rounded text-white" style="{% if reply.sender == request.user %}background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.3);{% else %}background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2);{% endif %} max-width: 80%;">
+                                <div class="small fw-bold {% if reply.sender.is_staff %}text-warning{% else %}text-info{% endif %} mb-1">
+                                    {{ reply.sender.username }} {% if reply.sender.is_staff %}(Support Android){% endif %}
+                                </div>
+                                <p class="small mb-0 leading-relaxed">{{ reply.message }}</p>
+                                <span class="small text-muted mt-2 d-block text-end" style="font-size: 8px;">{{ reply.created_at|date:"M d, H:i" }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Input box form -->
+                <form method="POST" class="border-top border-secondary pt-3 mt-auto">
+                    {% csrf_token %}
+                    <div class="d-flex gap-2">
+                        <input type="text" name="message" class="form-control form-cyber text-white py-2" placeholder="Input message telemetry..." required autocomplete="off">
+                        <button type="submit" class="btn btn-rgb px-4"><i class="fa-solid fa-share-all"></i></button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
